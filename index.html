@@ -8,114 +8,34 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="game-container">
-        <header class="game-header">
+    <div class="landing-container">
+        <div class="landing-content">
             <h1><i class="fas fa-rocket"></i> Spaceship Survival</h1>
-            <p>Maintain your ship's systems until rescue arrives in 15 turns!</p>
-        </header>
+            <p>A strategic survival game where you must maintain your ship's critical systems until rescue arrives.</p>
+            <p>Customize your challenge by selecting which systems and events to include in your game.</p>
 
-        <div class="game-stats">
-            <div class="turn-display">
-                <div class="turn-progress">
-                    <div class="turn-progress-bar" id="turn-progress-bar"></div>
+            <div class="game-features">
+                <div class="feature">
+                    <i class="fas fa-cogs"></i>
+                    <h3>Modular Systems</h3>
+                    <p>Choose from 3-8 critical ship systems to maintain</p>
                 </div>
-                <span id="turn-text">Turn: 1 / 15</span>
-            </div>
-        </div>
-
-        <div class="message-display" id="message-display">
-            <i class="fas fa-info-circle"></i>
-            <span>Welcome to the survival game! Maintain your systems until rescue arrives.</span>
-        </div>
-
-        <div class="systems-container">
-            <div id="system-life-support" class="system">
-                <div class="system-header">
-                    <i class="fas fa-lungs system-icon"></i>
-                    <h3>Life Support</h3>
+                <div class="feature">
+                    <i class="fas fa-random"></i>
+                    <h3>Random Events</h3>
+                    <p>Positive and negative events add unpredictability</p>
                 </div>
-                <div class="health-bar-container">
-                    <div class="health-bar"></div>
-                    <div class="health-bar-overlay"></div>
-                </div>
-                <div class="health-text">Health: 100/100</div>
-                <div class="caveat">Critical for survival. If this system fails completely, the game ends immediately.</div>
-                <button class="fix-button" data-system="Life Support">
-                    <i class="fas fa-wrench"></i> Fix Life Support
-                </button>
-            </div>
-
-            <div id="system-power" class="system">
-                <div class="system-header">
-                    <i class="fas fa-bolt system-icon"></i>
-                    <h3>Power</h3>
-                </div>
-                <div class="health-bar-container">
-                    <div class="health-bar"></div>
-                    <div class="health-bar-overlay"></div>
-                </div>
-                <div class="health-text">Health: 100/100</div>
-                <div class="caveat">Provides energy to all systems. Low power increases deterioration rates of other systems.</div>
-                <button class="fix-button" data-system="Power">
-                    <i class="fas fa-wrench"></i> Fix Power
-                </button>
-            </div>
-
-            <div id="system-navigation" class="system">
-                <div class="system-header">
-                    <i class="fas fa-compass system-icon"></i>
-                    <h3>Navigation</h3>
-                </div>
-                <div class="health-bar-container">
-                    <div class="health-bar"></div>
-                    <div class="health-bar-overlay"></div>
-                </div>
-                <div class="health-text">Health: 100/100</div>
-                <div class="caveat">Handles ship positioning and rescue signals. Failure may delay rescue arrival.</div>
-                <button class="fix-button" data-system="Navigation">
-                    <i class="fas fa-wrench"></i> Fix Navigation
-                </button>
-            </div>
-        </div>
-
-        <div class="event-log" id="event-log">
-            <h4><i class="fas fa-history"></i> Event Log</h4>
-            <div class="event-log-content" id="event-log-content">
-                <div class="event-item">
-                    <span class="event-time">Turn 1</span>
-                    <span class="event-text">Game started</span>
+                <div class="feature">
+                    <i class="fas fa-clock"></i>
+                    <h3>Dynamic Turns</h3>
+                    <p>Rescue time scales with your system count</p>
                 </div>
             </div>
-        </div>
 
-        <div id="game-over" class="game-over" style="display: none;">
-            <div class="game-over-content">
-                <i class="fas fa-trophy win-icon"></i>
-                <i class="fas fa-skull-crossbones lose-icon"></i>
-                <h2 id="game-over-title"></h2>
-                <p id="game-over-message"></p>
-            </div>
-        </div>
-
-        <button id="restart-button" class="restart-button" style="display: none;">
-            <i class="fas fa-redo"></i> Play Again
-        </button>
-    </div>
-
-    <!-- Event notification toast -->
-    <div id="event-toast" class="event-toast" style="display: none;">
-        <div class="event-toast-content">
-            <i class="fas fa-exclamation-triangle event-icon"></i>
-            <div class="event-toast-text">
-                <h4 id="event-toast-title"></h4>
-                <p id="event-toast-description"></p>
-            </div>
+            <a href="setup.html" class="start-button">
+                <i class="fas fa-play"></i> Start Game
+            </a>
         </div>
     </div>
-
-    <script type="module">
-        import { initializeGame } from './main.js';
-        initializeGame();
-    </script>
 </body>
 </html>

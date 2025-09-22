@@ -19,10 +19,13 @@ export function createGameState(config) {
     health: 100 // All systems start at full health
   }));
 
+  // Calculate max turns based on number of systems (5 turns per system)
+  const maxTurns = systems.length * 5;
+
   // Initialize the game state object
   const gameState = {
     turn: 1, // Start at turn 1
-    maxTurns: 15, // Total turns until rescue
+    maxTurns: maxTurns, // Total turns until rescue (5 per system)
     systems: systems, // Array of system objects with health
     gameOver: false, // Flag to indicate if the game has ended
     win: false, // Flag to indicate if the player won

@@ -36,51 +36,31 @@ export function updateUI(gameState, config = null, options = {}) {
     }
   }
 
-  // Update each system's health bar and display
-  gameState.systems.forEach(system => {
-    const systemElement = document.getElementById(`system-${system.name.toLowerCase().replace(' ', '-')}`);
-    if (systemElement) {
-      // Update health text
-      const healthText = systemElement.querySelector('.health-text');
-      if (healthText) {
-        healthText.textContent = `Health: ${system.health}/100`;
-      }
+  // Update header to reflect dynamic turns
+  const headerParagraph = document.querySelector('.game-header p');
+  if (headerParagraph) {
+    headerParagraph.textContent = `Maintain your ship's systems until rescue arrives in ${gameState.maxTurns} turns!`;
+  }
 
-      // Update health bar
-      const healthBar = systemElement.querySelector('.health-bar');
-      if (healthBar) {
-        healthBar.style.width = `${system.health}%`;
+  // Update system elements (preserve existing elements for smooth animations)
+  const systemsContainer = document.querySelector('.systems-container');
+  if (systemsContainer) {
+    const existingSystems = systemsContainer.querySelectorAll('.system');
 
-        // Update health bar color based on health with gradient
-        const healthPercent = system.health / 100;
-        if (healthPercent > 0.6) {
-          healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 50%, #00ff88 100%)';
-        } else if (healthPercent > 0.3) {
-          healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 70%, #ffff00 100%)';
-        } else {
-          healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ff4444 100%)';
-        }
-
-        // Add critical system warning
-        if (system.health < 20) {
-          systemElement.style.borderColor = 'var(--danger-color)';
-          systemElement.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.5)';
-        } else if (system.health < 50) {
-          systemElement.style.borderColor = 'var(--warning-color)';
-          systemElement.style.boxShadow = '0 0 10px rgba(255, 255, 0, 0.3)';
-        } else {
-          systemElement.style.borderColor = 'var(--border-color)';
-          systemElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
-        }
-      }
-
-      // Update caveat display
-      const caveatElement = systemElement.querySelector('.caveat');
-      if (caveatElement) {
-        caveatElement.textContent = system.caveat;
-      }
+    if (existingSystems.length === gameState.systems.length) {
+      // Update existing system elements for smooth transitions
+      gameState.systems.forEach((system, index) => {
+        updateSystemElement(existingSystems[index], system);
+      });
+    } else {
+      // Recreate all systems if count changed
+      systemsContainer.innerHTML = '';
+      gameState.systems.forEach(system => {
+        const systemElement = createSystemElement(system);
+        systemsContainer.appendChild(systemElement);
+      });
     }
-  });
+  }
 
   // Update button states based on game over status
   const buttons = document.querySelectorAll('.fix-button');
@@ -160,6 +140,128 @@ export function addEventToLog(eventText, turn) {
     // Auto-scroll to bottom
     eventLogContent.scrollTop = eventLogContent.scrollHeight;
   }
+}
+
+/**
+ * Create a system element for the UI
+ * @param {Object} system - The system object with name, health, and caveat
+ * @returns {HTMLElement} The created system element
+ */
+function createSystemElement(system) {
+  const systemElement = document.createElement('div');
+  systemElement.className = 'system';
+  systemElement.id = `system-${system.name.toLowerCase().replace(' ', '-')}`;
+
+  // Get system icon
+  const icon = getSystemIcon(system.name);
+
+  // Create system HTML
+  systemElement.innerHTML = `
+    <div class="system-header">
+      <i class="${icon} system-icon"></i>
+      <h3>${system.name}</h3>
+    </div>
+    <div class="health-bar-container">
+      <div class="health-bar"></div>
+      <div class="health-bar-overlay"></div>
+    </div>
+    <div class="health-text">Health: ${system.health}/100</div>
+    <div class="caveat">${system.caveat}</div>
+    <button class="fix-button" data-system="${system.name}">
+      <i class="fas fa-wrench"></i> Fix ${system.name}
+    </button>
+  `;
+
+  // Update health bar styling
+  const healthBar = systemElement.querySelector('.health-bar');
+  if (healthBar) {
+    healthBar.style.width = `${system.health}%`;
+
+    // Update health bar color based on health with gradient
+    const healthPercent = system.health / 100;
+    if (healthPercent > 0.6) {
+      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 50%, #00ff88 100%)';
+    } else if (healthPercent > 0.3) {
+      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 70%, #ffff00 100%)';
+    } else {
+      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ff4444 100%)';
+    }
+
+    // Add critical system warning
+    if (system.health < 20) {
+      systemElement.style.borderColor = 'var(--danger-color)';
+      systemElement.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.5)';
+    } else if (system.health < 50) {
+      systemElement.style.borderColor = 'var(--warning-color)';
+      systemElement.style.boxShadow = '0 0 10px rgba(255, 255, 0, 0.3)';
+    } else {
+      systemElement.style.borderColor = 'var(--border-color)';
+      systemElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+    }
+  }
+
+  return systemElement;
+}
+
+/**
+ * Update an existing system element with new health data
+ * @param {HTMLElement} systemElement - The existing system element to update
+ * @param {Object} system - The system object with updated name, health, and caveat
+ */
+function updateSystemElement(systemElement, system) {
+  // Update health bar width (this will animate smoothly due to CSS transition)
+  const healthBar = systemElement.querySelector('.health-bar');
+  if (healthBar) {
+    healthBar.style.width = `${system.health}%`;
+
+    // Update health bar color based on health with gradient
+    const healthPercent = system.health / 100;
+    if (healthPercent > 0.6) {
+      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 50%, #00ff88 100%)';
+    } else if (healthPercent > 0.3) {
+      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 70%, #ffff00 100%)';
+    } else {
+      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ff4444 100%)';
+    }
+  }
+
+  // Update health text
+  const healthText = systemElement.querySelector('.health-text');
+  if (healthText) {
+    healthText.textContent = `Health: ${system.health}/100`;
+  }
+
+  // Update caveat text (in case it changed)
+  const caveatElement = systemElement.querySelector('.caveat');
+  if (caveatElement) {
+    caveatElement.textContent = system.caveat;
+  }
+
+  // Update critical system warning styling
+  if (system.health < 20) {
+    systemElement.style.borderColor = 'var(--danger-color)';
+    systemElement.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.5)';
+  } else if (system.health < 50) {
+    systemElement.style.borderColor = 'var(--warning-color)';
+    systemElement.style.boxShadow = '0 0 10px rgba(255, 255, 0, 0.3)';
+  } else {
+    systemElement.style.borderColor = 'var(--border-color)';
+    systemElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
+  }
+}
+
+/**
+ * Get the FontAwesome icon class for a system
+ * @param {string} systemName - The name of the system
+ * @returns {string} The icon class
+ */
+function getSystemIcon(systemName) {
+  const iconMap = {
+    'Life Support': 'fas fa-lungs',
+    'Power': 'fas fa-bolt',
+    'Navigation': 'fas fa-compass'
+  };
+  return iconMap[systemName] || 'fas fa-cog';
 }
 
 /**
