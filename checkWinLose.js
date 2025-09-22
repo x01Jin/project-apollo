@@ -2,7 +2,7 @@
  * Check Win/Lose module for the survival game.
  * This module evaluates the current game state to determine if the game has ended.
  * The game is won if the player survives all 15 turns with systems intact.
- * The game is lost if any system reaches 0 health before the rescue arrives.
+ * The game is lost if ALL systems fail (reach 0 health) before the rescue arrives.
  * This check is performed after each turn and after player actions.
  *
  * @param {Object} gameState - The current game state object.
@@ -17,12 +17,12 @@ export function checkWinLose(gameState) {
   // Create a copy of the gameState to avoid mutation
   const updatedState = { ...gameState };
 
-  // Check for loss condition: any system has 0 or less health
-  const hasFailedSystem = updatedState.systems.some(system => system.health <= 0);
-  if (hasFailedSystem) {
+  // Check for loss condition: ALL systems have 0 or less health
+  const allSystemsFailed = updatedState.systems.every(system => system.health <= 0);
+  if (allSystemsFailed) {
     updatedState.gameOver = true;
     updatedState.win = false;
-    updatedState.message = 'A critical system has failed! Game Over.';
+    updatedState.message = 'All ship systems have failed! Game Over.';
     return updatedState;
   }
 
@@ -35,7 +35,10 @@ export function checkWinLose(gameState) {
   }
 
   // Game continues if no win or lose condition is met
-  updatedState.gameOver = false;
+  // Preserve gameOver if already set (e.g., by Life Support failure)
+  if (!updatedState.gameOver) {
+    updatedState.gameOver = false;
+  }
   updatedState.win = false;
 
   // Return the updated game state

@@ -1,19 +1,26 @@
 /**
- * Power Surge negative event data.
- * This module exports the configuration for the Power Surge event.
+ * Power Surge negative event module.
+ * This module contains all data and functionality for the Power Surge event.
  * A power surge overloads the systems, causing damage.
  */
 export const powerSurge = {
   description: "A power surge overloads the electrical systems!",
-  effect: (state) => {
+
+  /**
+   * Applies the power surge effect to the game state.
+   * @param {Object} state - The current game state
+   * @returns {Object} The updated game state
+   */
+  apply(state) {
+    const updatedState = { ...state };
     // Damage all systems by 20 points, but power system takes extra damage
-    state.systems.forEach(system => {
+    updatedState.systems = updatedState.systems.map(system => {
       if (system.name === "Power") {
-        system.health = Math.max(0, system.health - 40);
+        return { ...system, health: Math.max(0, system.health - 40) };
       } else {
-        system.health = Math.max(0, system.health - 20);
+        return { ...system, health: Math.max(0, system.health - 20) };
       }
     });
-    return state;
+    return updatedState;
   }
 };

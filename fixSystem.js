@@ -1,7 +1,7 @@
 /**
  * Fix System module for the survival game.
  * This module handles repairing a specific ship system.
- * When a player chooses to fix a system, it restores the system to full health.
+ * When a player chooses to fix a system, it calls the system's fix function.
  * Fixing a system is the main player action each turn.
  * Only one system can be fixed per turn due to limited resources.
  *
@@ -18,27 +18,16 @@ export function fixSystem(gameState, systemName) {
     throw new Error('Invalid systemName: must be a non-empty string');
   }
 
-  // Create a copy of the gameState to avoid mutation
-  const updatedState = { ...gameState };
-
   // Find the system to fix
-  const systemIndex = updatedState.systems.findIndex(system => system.name === systemName);
+  const system = gameState.systems.find(system => system.name === systemName);
 
   // Check if the system exists
-  if (systemIndex === -1) {
+  if (!system) {
     throw new Error(`System '${systemName}' not found`);
   }
 
-  // Fix the system by setting health to 100
-  updatedState.systems = updatedState.systems.map((system, index) => {
-    if (index === systemIndex) {
-      return {
-        ...system,
-        health: 100 // Restore to full health
-      };
-    }
-    return system;
-  });
+  // Call the system's fix function
+  const updatedState = system.fix(gameState);
 
   // Update the game message to reflect the repair
   updatedState.message = `${systemName} has been repaired to full health.`;

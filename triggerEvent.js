@@ -16,7 +16,7 @@ export function triggerEvent(gameState, config) {
   }
 
   // Create a copy of the gameState to avoid mutation
-  const updatedState = { ...gameState };
+  let updatedState = { ...gameState };
   let triggeredEvent = null;
 
   // Define event trigger probability (30% chance per turn)
@@ -44,12 +44,7 @@ export function triggerEvent(gameState, config) {
       updatedState.message = selectedEvent.description;
 
       // Apply the event's effect to the game state
-      const newState = selectedEvent.effect(updatedState);
-
-      // Ensure the returned state is valid
-      if (newState && newState.systems) {
-        updatedState.systems = newState.systems;
-      }
+      updatedState = selectedEvent.apply(updatedState);
 
       // Store the triggered event for return
       triggeredEvent = selectedEvent;
