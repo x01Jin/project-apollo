@@ -29,6 +29,12 @@ export async function handleClick(systemName, gameState, config) {
     return gameState;
   }
 
+  // Check if an interactive event is active
+  if (gameState.interactiveMode) {
+    console.log('Interactive event is active, ignoring normal click');
+    return gameState;
+  }
+
   let updatedState = { ...gameState };
 
   try {
@@ -43,6 +49,11 @@ export async function handleClick(systemName, gameState, config) {
     let eventTriggered = null;
 
     if (isSystemDead) {
+      // Check if an interactive event is active - force recovery should be blocked
+      if (gameState.interactiveMode) {
+        console.log('Interactive event is active, ignoring force recovery attempt');
+        return gameState;
+      }
       // Force recovery attempt for dead system
       const recoverySuccess = Math.random() < 0.1; // 10% chance
 
@@ -63,7 +74,7 @@ export async function handleClick(systemName, gameState, config) {
 
       // Trigger random event if game not over
       if (!updatedState.gameOver) {
-        const eventResult = triggerEvent(updatedState, config);
+        const eventResult = await triggerEvent(updatedState, config);
         updatedState = eventResult.state;
         eventTriggered = eventResult.event;
       }
@@ -87,7 +98,7 @@ export async function handleClick(systemName, gameState, config) {
 
       // Step 5: Trigger random event if game not over
       if (!updatedState.gameOver) {
-        const eventResult = triggerEvent(updatedState, config);
+        const eventResult = await triggerEvent(updatedState, config);
         updatedState = eventResult.state;
         eventTriggered = eventResult.event;
       }

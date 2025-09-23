@@ -66,6 +66,11 @@ export function updateUI(gameState, config = null, options = {}) {
   const buttons = document.querySelectorAll('.fix-button');
   buttons.forEach(button => {
     button.disabled = gameState.gameOver;
+    if (gameState.gameOver) {
+      button.classList.add('game-over');
+    } else {
+      button.classList.remove('game-over');
+    }
   });
 
   // Handle game over state and button states
@@ -85,12 +90,12 @@ export function updateUI(gameState, config = null, options = {}) {
       gameOverElement.style.display = 'block';
 
       if (gameState.win) {
-        gameOverTitle.textContent = 'Victory!';
+        gameOverTitle.textContent = 'Survived!';
         gameOverMessage.textContent = 'You successfully maintained your ship systems until rescue arrived!';
         if (winIcon) winIcon.style.display = 'block';
         if (loseIcon) loseIcon.style.display = 'none';
       } else {
-        gameOverTitle.textContent = 'Game Over';
+        gameOverTitle.textContent = 'Failed!';
         gameOverMessage.textContent = 'Your ship systems failed. Rescue could not reach you in time.';
         if (winIcon) winIcon.style.display = 'none';
         if (loseIcon) loseIcon.style.display = 'block';
@@ -183,7 +188,7 @@ function createSystemElement(system) {
     <div class="health-text">Health: ${system.health}/100</div>
     <div class="caveat">${system.caveat}</div>
     <button class="fix-button" data-system="${system.name}">
-      <i class="fas fa-wrench"></i> Fix ${system.name}
+      <i class="fas fa-wrench"></i> Fix
     </button>
   `;
 

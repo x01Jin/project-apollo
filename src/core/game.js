@@ -38,6 +38,23 @@ export async function initializeGame() {
     // Update UI with initial state (after deterioration)
     updateUI(gameState, config);
 
+    // Listen for interactive event completion
+    document.addEventListener('interactiveEventCompleted', (event) => {
+      gameState = event.detail.updatedState;
+
+      // Update button states after interactive event completion
+      const systemsContainer = document.querySelector('.systems-container');
+      if (systemsContainer) {
+        if (gameState.interactiveMode) {
+          const allButtons = systemsContainer.querySelectorAll('.fix-button');
+          allButtons.forEach(btn => btn.disabled = true);
+        } else {
+          const allButtons = systemsContainer.querySelectorAll('.fix-button');
+          allButtons.forEach(btn => btn.disabled = false);
+        }
+      }
+    });
+
     // Use event delegation for fix buttons (attaches to container that doesn't change)
     const systemsContainer = document.querySelector('.systems-container');
     if (systemsContainer) {
@@ -55,7 +72,20 @@ export async function initializeGame() {
           // Check if game is over and disable all buttons
           if (gameState.gameOver) {
             const allButtons = systemsContainer.querySelectorAll('.fix-button');
+            allButtons.forEach(btn => {
+              btn.disabled = true;
+              btn.classList.add('game-over');
+            });
+          }
+
+          // Disable buttons during interactive mode
+          if (gameState.interactiveMode) {
+            const allButtons = systemsContainer.querySelectorAll('.fix-button');
             allButtons.forEach(btn => btn.disabled = true);
+          } else {
+            // Re-enable buttons when not in interactive mode
+            const allButtons = systemsContainer.querySelectorAll('.fix-button');
+            allButtons.forEach(btn => btn.disabled = false);
           }
         }
       });
@@ -86,9 +116,12 @@ export async function initializeGame() {
           `;
         }
 
-        // Re-enable buttons
+        // Re-enable buttons and remove game-over class
         const allButtons = systemsContainer.querySelectorAll('.fix-button');
-        allButtons.forEach(btn => btn.disabled = false);
+        allButtons.forEach(btn => {
+          btn.disabled = false;
+          btn.classList.remove('game-over');
+        });
 
         // Update UI
         updateUI(gameState, config);

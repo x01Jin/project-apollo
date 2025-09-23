@@ -9,7 +9,7 @@
  * @param {Object} config - The game configuration containing events arrays.
  * @returns {Object} The updated game state after applying any triggered event.
  */
-export function triggerEvent(gameState, config) {
+export async function triggerEvent(gameState, config) {
   // Validate inputs
   if (!gameState || !config) {
     throw new Error('Invalid parameters: gameState and config are required');
@@ -40,27 +40,43 @@ export function triggerEvent(gameState, config) {
 
     // Apply the selected event if one was chosen
     if (selectedEvent) {
-      // Capture state before event application for system hooks
-      const stateBeforeEvent = { ...updatedState };
+      // Check if this is an interactive event
+      if (selectedEvent.interactive) {
+        // Import interactive events module
+        const { showInteractiveEvent } = await import('./interactiveEvents.js');
 
-      // Update the message to describe the event
-      updatedState.message = selectedEvent.description;
+        // Show interactive event popup instead of immediate application
+        updatedState = showInteractiveEvent(updatedState, config, selectedEvent);
 
-      // Apply the event's effect to the game state
-      updatedState = selectedEvent.apply(updatedState);
+        // Store the triggered event for return
+        triggeredEvent = selectedEvent;
 
-      // Allow systems to react to the event
-      for (const system of updatedState.systems) {
-        if (system.onEvent) {
-          updatedState = system.onEvent(updatedState, selectedEvent, config, stateBeforeEvent);
+        // Log the interactive event for debugging
+        console.log('Interactive event triggered:', selectedEvent.description);
+      } else {
+        // Handle regular (non-interactive) events
+        // Capture state before event application for system hooks
+        const stateBeforeEvent = { ...updatedState };
+
+        // Update the message to describe the event
+        updatedState.message = selectedEvent.description;
+
+        // Apply the event's effect to the game state
+        updatedState = selectedEvent.apply(updatedState);
+
+        // Allow systems to react to the event
+        for (const system of updatedState.systems) {
+          if (system.onEvent) {
+            updatedState = system.onEvent(updatedState, selectedEvent, config, stateBeforeEvent);
+          }
         }
+
+        // Store the triggered event for return
+        triggeredEvent = selectedEvent;
+
+        // Log the event for debugging
+        console.log('Event triggered:', selectedEvent.description);
       }
-
-      // Store the triggered event for return
-      triggeredEvent = selectedEvent;
-
-      // Log the event for debugging
-      console.log('Event triggered:', selectedEvent.description);
     }
   } else {
     // No event triggered, update message accordingly
