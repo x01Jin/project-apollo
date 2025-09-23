@@ -35,5 +35,115 @@
             <p>A strategic survival game where you must maintain your ship's critical systems until rescue arrives.</p>
         </div>
     </div>
+
+    <script>
+        // Mobile Feature Cards Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const features = document.querySelectorAll('.feature');
+            const gameFeatures = document.querySelector('.game-features');
+
+            // Debug logging
+            console.log('Feature cards found:', features.length);
+            console.log('Game features container:', gameFeatures);
+            console.log('Current screen width:', window.innerWidth);
+
+            // Only apply mobile behavior on small screens
+            function isMobile() {
+                const mobile = window.innerWidth <= 768;
+                console.log('Is mobile:', mobile, '(width:', window.innerWidth, ')');
+                return mobile;
+            }
+
+            // Apply mobile styles immediately if on mobile
+            function applyMobileStyles() {
+                if (isMobile()) {
+                    console.log('Applying mobile styles');
+                    features.forEach((feature, index) => {
+                        feature.style.position = 'relative';
+                        feature.style.width = '50px';
+                        feature.style.height = '50px';
+                        feature.style.borderRadius = '50%';
+                        feature.style.cursor = 'pointer';
+                        feature.style.display = 'flex';
+                        feature.style.alignItems = 'center';
+                        feature.style.justifyContent = 'center';
+                        feature.style.marginBottom = '10px';
+                        feature.style.zIndex = '1000';
+                        console.log('Applied mobile styles to feature', index + 1);
+                    });
+                } else {
+                    console.log('Desktop mode - removing mobile styles');
+                    features.forEach(feature => {
+                        feature.classList.remove('expanded');
+                        // Remove inline styles to allow CSS to take over
+                        feature.style.position = '';
+                        feature.style.width = '';
+                        feature.style.height = '';
+                        feature.style.borderRadius = '';
+                        feature.style.cursor = '';
+                        feature.style.display = '';
+                        feature.style.alignItems = '';
+                        feature.style.justifyContent = '';
+                        feature.style.marginBottom = '';
+                        feature.style.zIndex = '';
+                    });
+                }
+            }
+
+            // Handle feature card clicks
+            features.forEach((feature, index) => {
+                feature.addEventListener('click', function(e) {
+                    console.log('Feature', index + 1, 'clicked');
+                    e.stopPropagation();
+
+                    if (!isMobile()) {
+                        console.log('Desktop mode - ignoring click');
+                        return;
+                    }
+
+                    console.log('Mobile mode - toggling expansion');
+
+                    // Close all other expanded cards
+                    features.forEach(f => {
+                        if (f !== feature) {
+                            f.classList.remove('expanded');
+                        }
+                    });
+
+                    // Toggle current card
+                    const willExpand = !feature.classList.contains('expanded');
+                    feature.classList.toggle('expanded');
+                    console.log('Feature', index + 1, willExpand ? 'expanded' : 'collapsed');
+                });
+            });
+
+            // Close expanded cards when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!isMobile()) return;
+
+                if (!gameFeatures.contains(e.target)) {
+                    console.log('Clicked outside - closing all expanded cards');
+                    features.forEach(feature => {
+                        feature.classList.remove('expanded');
+                    });
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                console.log('Window resized to:', window.innerWidth);
+                applyMobileStyles();
+
+                if (!isMobile()) {
+                    features.forEach(feature => {
+                        feature.classList.remove('expanded');
+                    });
+                }
+            });
+
+            // Apply initial styles
+            applyMobileStyles();
+        });
+    </script>
 </body>
 </html>

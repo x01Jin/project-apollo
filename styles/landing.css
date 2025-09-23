@@ -237,7 +237,7 @@ body::before {
     font-weight: 300;
 }
 
-/* Responsive design */
+/* Mobile Feature Cards - Collapsible Design */
 @media (max-width: 768px) {
     body {
         padding: 10px;
@@ -248,35 +248,122 @@ body::before {
         letter-spacing: 2px;
     }
 
+    /* Mobile: Position cards as mini icons at top-right */
     .game-features {
-        height: 300px;
-        margin: 30px 0;
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        z-index: 1000 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        gap: 15px !important;
     }
 
     .feature {
-        min-width: 160px;
-        padding: 15px;
+        position: relative !important;
+        width: 50px !important;
+        height: 50px !important;
+        min-width: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        cursor: pointer !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        flex-shrink: 0 !important;
+        /* CRITICAL: Enable pointer events for mobile clicks */
+        pointer-events: auto !important;
     }
 
-    .feature:nth-child(1) {
-        position: static;
-        transform: none;
-        margin: 0 auto 20px auto;
-        animation: none;
+    .feature:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
     }
 
-    .feature:nth-child(2) {
-        position: static;
-        transform: none;
-        margin: 0 auto 20px auto;
-        animation: none;
+    /* Collapsed state - just icons */
+    .feature:not(.expanded) {
+        background: linear-gradient(145deg, var(--background-card) 0%, var(--background-secondary) 100%) !important;
+        border: 2px solid var(--border-color) !important;
     }
 
+    .feature:not(.expanded) i {
+        font-size: 1.5rem !important;
+        margin: 0 !important;
+        color: var(--primary-color) !important;
+        text-shadow: 0 0 15px var(--primary-color) !important;
+    }
+
+    .feature:not(.expanded) h3,
+    .feature:not(.expanded) p {
+        display: none !important;
+    }
+
+    /* Expanded state - full cards slide out */
+    .feature.expanded {
+        position: fixed !important;
+        top: 20px !important;
+        right: 20px !important;
+        width: 350px !important;
+        height: auto !important;
+        min-height: 120px !important;
+        border-radius: 15px !important;
+        padding: 20px !important;
+        margin: 0 !important;
+        z-index: 1001 !important;
+        transform: translateX(0) !important;
+        animation: slideInFromRight 0.3s ease-out !important;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+        background: linear-gradient(145deg, var(--background-card) 0%, var(--background-secondary) 100%) !important;
+        border: 2px solid var(--primary-color) !important;
+        backdrop-filter: blur(10px) !important;
+        /* Ensure expanded card doesn't affect collapsed cards layout */
+        pointer-events: auto !important;
+    }
+
+    .feature.expanded i {
+        font-size: 2rem !important;
+        margin-bottom: 15px !important;
+        display: block !important;
+        color: var(--primary-color) !important;
+        text-shadow: 0 0 15px var(--primary-color) !important;
+    }
+
+    .feature.expanded h3 {
+        display: block !important;
+        color: var(--primary-color) !important;
+        font-family: 'Orbitron', monospace !important;
+        font-size: 1.2rem !important;
+        font-weight: 700 !important;
+        margin: 0 0 10px 0 !important;
+        letter-spacing: 1px !important;
+    }
+
+    .feature.expanded p {
+        display: block !important;
+        color: var(--text-secondary) !important;
+        margin: 0 !important;
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+    }
+
+    /* Remove floating animations on mobile */
+    .feature:nth-child(1),
+    .feature:nth-child(2),
     .feature:nth-child(3) {
-        position: static;
-        transform: none;
-        margin: 0 auto;
-        animation: none;
+        position: relative !important;
+        animation: none !important;
+        transform: none !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        bottom: auto !important;
     }
 
     .start-button {
@@ -287,6 +374,17 @@ body::before {
     .landing-content > p {
         font-size: 1rem;
         margin-top: 20px;
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 }
 
