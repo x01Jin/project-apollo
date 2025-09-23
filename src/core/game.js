@@ -8,7 +8,7 @@
 export async function initializeGame() {
   try {
     // Import required modules
-    const { getConfig } = await import('./config.js');
+    const { getConfig } = await import('../../config.js');
     const { createGameState } = await import('./gameState.js');
     const { updateUI } = await import('./updateUI.js');
     const { handleClick } = await import('./handleClick.js');
@@ -32,7 +32,7 @@ export async function initializeGame() {
     console.log('Initial game state:', gameState);
 
     // Apply initial deterioration for turn 1
-    const { deteriorateSystems } = await import('./deteriorateSystems.js');
+    const { deteriorateSystems } = await import('../mechanics/deteriorateSystems.js');
     gameState = deteriorateSystems(gameState);
 
     // Update UI with initial state (after deterioration)

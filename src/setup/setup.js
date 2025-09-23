@@ -7,7 +7,7 @@
 export async function initializeSetup() {
   try {
     // Get all available systems and events from config
-    const { getConfig } = await import('./config.js');
+    const { getConfig } = await import('../../config.js');
     const config = await getConfig();
 
     // Available systems and events

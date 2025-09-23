@@ -12,9 +12,9 @@
  */
 export async function handleClick(systemName, gameState, config) {
   // Import required modules dynamically to avoid circular dependencies
-  const { fixSystem } = await import('./fixSystem.js');
-  const { deteriorateSystems } = await import('./deteriorateSystems.js');
-  const { triggerEvent } = await import('./triggerEvent.js');
+  const { fixSystem } = await import('../mechanics/fixSystem.js');
+  const { deteriorateSystems } = await import('../mechanics/deteriorateSystems.js');
+  const { triggerEvent } = await import('../mechanics/triggerEvent.js');
   const { checkWinLose } = await import('./checkWinLose.js');
   const { updateUI } = await import('./updateUI.js');
 
