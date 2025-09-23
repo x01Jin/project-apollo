@@ -63,6 +63,26 @@ export async function initializeSetup() {
       beginButton.disabled = selectedSystems.length < 3 || selectedSystems.length > 8;
     }
 
+    // Toggle system selection
+    function toggleSystem(system, checkbox) {
+      if (checkbox.checked) {
+        selectedSystems.push(system);
+      } else {
+        selectedSystems = selectedSystems.filter(s => s !== system);
+      }
+      updateUI();
+    }
+
+    // Toggle event selection
+    function toggleEvent(event, checkbox) {
+      if (checkbox.checked) {
+        selectedEvents.push(event);
+      } else {
+        selectedEvents = selectedEvents.filter(e => e !== event);
+      }
+      updateUI();
+    }
+
     // Create system selection card
     function createSystemCard(system) {
       const card = document.createElement('div');
@@ -82,19 +102,13 @@ export async function initializeSetup() {
       `;
 
       const checkbox = card.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          selectedSystems.push(system);
-        } else {
-          selectedSystems = selectedSystems.filter(s => s !== system);
-        }
-        updateUI();
-      });
+      checkbox.addEventListener('change', () => toggleSystem(system, checkbox));
 
       // Make the entire card clickable to toggle the checkbox
       card.addEventListener('click', (event) => {
         if (event.target === checkbox) return; // Let checkbox handle its own clicks
         checkbox.checked = !checkbox.checked;
+        toggleSystem(system, checkbox);
       });
 
       if (isSelected) {
@@ -105,37 +119,31 @@ export async function initializeSetup() {
     }
 
     // Create event selection card
-    function createEventCard(event) {
+    function createEventCard(eventObj) {
       const card = document.createElement('div');
-      card.className = `selection-card event-card ${event.type}`;
-      card.dataset.eventDescription = event.description;
+      card.className = `selection-card event-card ${eventObj.type}`;
+      card.dataset.eventDescription = eventObj.description;
 
-      const icon = event.type === 'positive' ? 'fas fa-plus-circle' : 'fas fa-minus-circle';
-      const isSelected = selectedEvents.includes(event);
+      const icon = eventObj.type === 'positive' ? 'fas fa-plus-circle' : 'fas fa-minus-circle';
+      const isSelected = selectedEvents.includes(eventObj);
 
       card.innerHTML = `
         <div class="card-header">
           <i class="${icon}"></i>
           <input type="checkbox" ${isSelected ? 'checked' : ''}>
         </div>
-        <h3>${event.type === 'positive' ? 'Positive' : 'Negative'} Event</h3>
-        <p>${event.description}</p>
+        <h3>${eventObj.type === 'positive' ? 'Positive' : 'Negative'} Event</h3>
+        <p>${eventObj.description}</p>
       `;
 
       const checkbox = card.querySelector('input[type="checkbox"]');
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          selectedEvents.push(event);
-        } else {
-          selectedEvents = selectedEvents.filter(e => e !== event);
-        }
-        updateUI();
-      });
+      checkbox.addEventListener('change', () => toggleEvent(eventObj, checkbox));
 
       // Make the entire card clickable to toggle the checkbox
-      card.addEventListener('click', (event) => {
-        if (event.target === checkbox) return; // Let checkbox handle its own clicks
+      card.addEventListener('click', (clickEvent) => {
+        if (clickEvent.target === checkbox) return; // Let checkbox handle its own clicks
         checkbox.checked = !checkbox.checked;
+        toggleEvent(eventObj, checkbox);
       });
 
       if (isSelected) {
