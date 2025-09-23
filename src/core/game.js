@@ -75,6 +75,17 @@ export async function initializeGame() {
         // Apply initial deterioration for turn 1
         gameState = deteriorateSystems(gameState);
 
+        // Clear event log and reset to initial state
+        const eventLogContent = document.getElementById('event-log-content');
+        if (eventLogContent) {
+          eventLogContent.innerHTML = `
+            <div class="event-item">
+              <span class="event-time">Turn 1</span>
+              <span class="event-text">Game started</span>
+            </div>
+          `;
+        }
+
         // Re-enable buttons
         const allButtons = systemsContainer.querySelectorAll('.fix-button');
         allButtons.forEach(btn => btn.disabled = false);
