@@ -61,10 +61,14 @@ export async function initializeGame() {
       });
     }
 
-    // Attach restart functionality (if restart button exists)
-    const restartButton = document.getElementById('restart-button');
-    if (restartButton) {
-      restartButton.addEventListener('click', async () => {
+    // Attach button functionalities
+    const retryButton = document.getElementById('retry-button');
+    const setupButton = document.getElementById('setup-button');
+    const abandonButton = document.getElementById('abandon-button');
+
+    // Retry button functionality
+    if (retryButton) {
+      retryButton.addEventListener('click', async () => {
         // Reset game state
         gameState = createGameState(config);
 
@@ -79,6 +83,20 @@ export async function initializeGame() {
         updateUI(gameState, config);
 
         console.log('Game restarted');
+      });
+    }
+
+    // Setup button functionality
+    if (setupButton) {
+      setupButton.addEventListener('click', () => {
+        window.location.href = 'setup.html';
+      });
+    }
+
+    // Abandon button functionality
+    if (abandonButton) {
+      abandonButton.addEventListener('click', () => {
+        window.location.href = 'index.html';
       });
     }
 

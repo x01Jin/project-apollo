@@ -68,14 +68,18 @@ export function updateUI(gameState, config = null, options = {}) {
     button.disabled = gameState.gameOver;
   });
 
-  // Show win/lose message if game is over
+  // Handle game over state and button states
+  const gameOverElement = document.getElementById('game-over');
+  const retryButton = document.getElementById('retry-button');
+  const setupButton = document.getElementById('setup-button');
+  const abandonButton = document.getElementById('abandon-button');
+
   if (gameState.gameOver) {
-    const gameOverElement = document.getElementById('game-over');
+    // Show game over message
     const gameOverTitle = document.getElementById('game-over-title');
     const gameOverMessage = document.getElementById('game-over-message');
     const winIcon = document.querySelector('.win-icon');
     const loseIcon = document.querySelector('.lose-icon');
-    const restartButton = document.getElementById('restart-button');
 
     if (gameOverElement && gameOverTitle && gameOverMessage) {
       gameOverElement.style.display = 'block';
@@ -91,13 +95,24 @@ export function updateUI(gameState, config = null, options = {}) {
         if (winIcon) winIcon.style.display = 'none';
         if (loseIcon) loseIcon.style.display = 'block';
       }
-
-      // Show restart button
-      if (restartButton) {
-        restartButton.style.display = 'block';
-      }
     }
+
+    // Enable retry and setup buttons when game is over
+    if (retryButton) retryButton.disabled = false;
+    if (setupButton) setupButton.disabled = false;
+  } else {
+    // Hide game over message when game is not over
+    if (gameOverElement) {
+      gameOverElement.style.display = 'none';
+    }
+
+    // Disable retry and setup buttons when game is not over
+    if (retryButton) retryButton.disabled = true;
+    if (setupButton) setupButton.disabled = true;
   }
+
+  // Abandon button is always enabled
+  if (abandonButton) abandonButton.disabled = false;
 
   // Add event to log if provided
   if (options.eventToLog) {
