@@ -7,6 +7,11 @@
  */
 export async function initializeGame() {
   try {
+    // Show loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+      loadingOverlay.classList.remove('hidden');
+    }
     // Import required modules
     const { getConfig } = await import('../../config.js');
     const { createGameState } = await import('./gameState.js');
@@ -144,10 +149,20 @@ export async function initializeGame() {
       });
     }
 
+    // Hide loading overlay
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('hidden');
+    }
+
     console.log('Game initialized successfully');
 
   } catch (error) {
     console.error('Failed to initialize game:', error);
+    // Hide loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('hidden');
+    }
     // Display error message to user
     const messageElement = document.getElementById('message-display');
     if (messageElement) {

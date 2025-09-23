@@ -6,6 +6,11 @@
  */
 export async function initializeSetup() {
   try {
+    // Show loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+      loadingOverlay.classList.remove('hidden');
+    }
     // Get all available systems and events from config
     const { getConfig } = await import('../../config.js');
     const config = await getConfig();
@@ -173,10 +178,20 @@ export async function initializeSetup() {
     // Initialize UI
     updateUI();
 
+    // Hide loading overlay
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('hidden');
+    }
+
     console.log('Setup initialized successfully');
 
   } catch (error) {
     console.error('Failed to initialize setup:', error);
+    // Hide loading overlay
+    const loadingOverlay = document.getElementById('loading-overlay');
+    if (loadingOverlay) {
+      loadingOverlay.classList.add('hidden');
+    }
     // Display error message to user
     const container = document.querySelector('.setup-container');
     if (container) {
