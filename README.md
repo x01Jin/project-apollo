@@ -2,11 +2,11 @@
 
 A strategic survival game where you maintain your spaceship's critical systems until rescue arrives.
 
-<div align="center">
-  <a href="https://x01jin.github.io/project-apollo/" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; transition: background-color 0.3s;">
-    🚀 Play Online
+<p align="center">
+  <a href="https://x01jin.github.io/project-apollo/">
+    <img src="https://img.shields.io/badge/🚀%20Play%20Online-blue?style=for-the-badge" alt="Play Online" />
   </a>
-</div>
+</p>
 
 ## Gameplay
 
