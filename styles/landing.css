@@ -245,12 +245,26 @@ body::before {
 /* Mobile Feature Cards - Collapsible Design */
 @media (max-width: 768px) {
     .landing-container {
-        padding: 10px;
+        padding: 5px;
+        height: calc(100vh - 40px);
     }
 
     .landing-content h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
         letter-spacing: 2px;
+        margin: 0 0 15px 0;
+    }
+
+    .start-button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        margin: 15px auto;
+    }
+
+    .landing-content > p {
+        font-size: 0.9rem;
+        margin-top: 15px;
+        line-height: 1.4;
     }
 
     /* Mobile: Position cards as mini icons at top-right */
@@ -414,5 +428,91 @@ body::before {
 
     .feature p {
         font-size: 0.8rem;
+    }
+}
+
+/* Footer Styles */
+.landing-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    animation: footerFloat 20s ease-in-out infinite;
+}
+
+.footer-content {
+    padding: 15px 20px;
+    text-align: center;
+}
+
+.footer-details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.9rem;
+}
+
+.footer-item {
+    color: var(--text-secondary);
+    font-weight: 300;
+}
+
+.footer-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.footer-link:hover {
+    color: var(--secondary-color);
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+.footer-link i {
+    font-size: 0.8rem;
+}
+
+.footer-separator {
+    color: var(--border-color);
+    font-weight: 300;
+}
+
+@keyframes footerFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Mobile Footer */
+@media (max-width: 768px) {
+    .landing-footer {
+        position: fixed;
+        animation: footerFloatMobile 20s ease-in-out infinite;
+    }
+
+    .footer-content {
+        padding: 12px 15px;
+    }
+
+    .footer-details {
+        font-size: 0.8rem;
+        gap: 8px;
+    }
+
+    .footer-link {
+        font-size: 0.8rem;
+    }
+
+    @keyframes footerFloatMobile {
+        0%, 100% { transform: translateY(0); }
+        25% { transform: translateY(-5px); }
+        50% { transform: translateY(0); }
+        75% { transform: translateY(5px); }
     }
 }
