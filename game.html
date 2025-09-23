@@ -4,56 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Apollo Game</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/game.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="game-container">
-        <header class="game-header">
-            <h1><i class="fas fa-rocket"></i> Project Apollo</h1>
-            <p>Maintain your ship's systems until rescue arrives in 15 turns!</p>
-        </header>
+        <div class="left-panel">
+            <header class="game-header">
+                <h1><i class="fas fa-rocket"></i> Project Apollo</h1>
+                <p>Maintain your ship's systems until rescue arrives in 15 turns!</p>
+            </header>
 
-        <div class="game-stats">
-            <div class="turn-display">
-                <div class="turn-progress">
-                    <div class="turn-progress-bar" id="turn-progress-bar"></div>
-                </div>
-                <span id="turn-text">Turn: 1 / 15</span>
+            <div class="systems-container">
+                <!-- Systems will be populated dynamically by JavaScript -->
             </div>
-        </div>
 
-        <div class="message-display" id="message-display">
-            <i class="fas fa-info-circle"></i>
-            <span>Welcome to the survival game! Maintain your systems until rescue arrives.</span>
-        </div>
-
-        <div class="systems-container">
-            <!-- Systems will be populated dynamically by JavaScript -->
-        </div>
-
-        <div class="event-log" id="event-log">
-            <h4><i class="fas fa-history"></i> Event Log</h4>
-            <div class="event-log-content" id="event-log-content">
-                <div class="event-item">
-                    <span class="event-time">Turn 1</span>
-                    <span class="event-text">Game started</span>
+            <div class="game-stats">
+                <div class="turn-display">
+                    <div class="turn-progress">
+                        <div class="turn-progress-bar" id="turn-progress-bar"></div>
+                    </div>
+                    <span id="turn-text">Turn: 1 / 15</span>
                 </div>
             </div>
-        </div>
 
-        <div id="game-over" class="game-over" style="display: none;">
-            <div class="game-over-content">
-                <i class="fas fa-trophy win-icon"></i>
-                <i class="fas fa-skull-crossbones lose-icon"></i>
-                <h2 id="game-over-title"></h2>
-                <p id="game-over-message"></p>
+            <div class="message-display" id="message-display">
+                <i class="fas fa-info-circle"></i>
+                <span>Welcome to the survival game! Maintain your systems until rescue arrives.</span>
             </div>
         </div>
 
-        <button id="restart-button" class="restart-button" style="display: none;">
-            <i class="fas fa-redo"></i> Play Again
-        </button>
+        <div class="right-panel">
+            <div class="event-log" id="event-log">
+                <h4><i class="fas fa-history"></i> Event Log</h4>
+                <div class="event-log-content" id="event-log-content">
+                    <div class="event-item">
+                        <span class="event-time">Turn 1</span>
+                        <span class="event-text">Game started</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="game-over" class="game-over" style="display: none;">
+                <div class="game-over-content">
+                    <i class="fas fa-trophy win-icon"></i>
+                    <i class="fas fa-skull-crossbones lose-icon"></i>
+                    <h2 id="game-over-title"></h2>
+                    <p id="game-over-message"></p>
+                </div>
+            </div>
+
+            <button id="restart-button" class="restart-button" style="display: none;">
+                <i class="fas fa-redo"></i> Play Again
+            </button>
+        </div>
     </div>
 
     <!-- Event notification toast -->
