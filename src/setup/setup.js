@@ -91,6 +91,12 @@ export async function initializeSetup() {
         updateUI();
       });
 
+      // Make the entire card clickable to toggle the checkbox
+      card.addEventListener('click', (event) => {
+        if (event.target === checkbox) return; // Let checkbox handle its own clicks
+        checkbox.checked = !checkbox.checked;
+      });
+
       if (isSelected) {
         card.classList.add('selected');
       }
@@ -124,6 +130,12 @@ export async function initializeSetup() {
           selectedEvents = selectedEvents.filter(e => e !== event);
         }
         updateUI();
+      });
+
+      // Make the entire card clickable to toggle the checkbox
+      card.addEventListener('click', (event) => {
+        if (event.target === checkbox) return; // Let checkbox handle its own clicks
+        checkbox.checked = !checkbox.checked;
       });
 
       if (isSelected) {
