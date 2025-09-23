@@ -28,9 +28,9 @@ body {
     background-attachment: fixed;
     color: var(--text-primary);
     margin: 0;
-    padding: 20px;
-    min-height: 100vh;
-    overflow-x: hidden;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
     position: relative;
 }
 
@@ -56,13 +56,15 @@ body::before {
 }
 
 .landing-container {
-    min-height: 100vh;
+    height: 100vh;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     position: relative;
     z-index: 1;
+    box-sizing: border-box;
 }
 
 .landing-content {
@@ -128,14 +130,14 @@ body::before {
 
 .feature:nth-child(1) {
     top: 15%;
-    right: 5%;
+    right: 2%;
     transform: translateY(-50%);
     animation: float1 6s ease-in-out infinite;
 }
 
 .feature:nth-child(2) {
     bottom: 15%;
-    right: 5%;
+    right: 2%;
     transform: translateY(50%);
     animation: float2 7s ease-in-out infinite;
 }
@@ -233,13 +235,16 @@ body::before {
     font-size: 1.1rem;
     line-height: 1.6;
     margin: 30px 0 0 0;
-    max-width: 600px;
     font-weight: 300;
+    word-wrap: break-word;
+    hyphens: auto;
+    text-align: justify !important;
+    text-align-last: center !important;
 }
 
 /* Mobile Feature Cards - Collapsible Design */
 @media (max-width: 768px) {
-    body {
+    .landing-container {
         padding: 10px;
     }
 

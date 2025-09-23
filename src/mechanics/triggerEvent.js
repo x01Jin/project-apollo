@@ -40,11 +40,21 @@ export function triggerEvent(gameState, config) {
 
     // Apply the selected event if one was chosen
     if (selectedEvent) {
+      // Capture state before event application for system hooks
+      const stateBeforeEvent = { ...updatedState };
+
       // Update the message to describe the event
       updatedState.message = selectedEvent.description;
 
       // Apply the event's effect to the game state
       updatedState = selectedEvent.apply(updatedState);
+
+      // Allow systems to react to the event
+      for (const system of updatedState.systems) {
+        if (system.onEvent) {
+          updatedState = system.onEvent(updatedState, selectedEvent, config, stateBeforeEvent);
+        }
+      }
 
       // Store the triggered event for return
       triggeredEvent = selectedEvent;
