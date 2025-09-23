@@ -6,6 +6,7 @@
  */
 export const lifeSupport = {
   name: "Life Support",
+  icon: "fas fa-lungs",
   caveat: "Critical for survival. If this system fails completely, the game ends immediately.",
 
   /**

@@ -168,7 +168,7 @@ function createSystemElement(system) {
   systemElement.id = `system-${system.name.toLowerCase().replace(' ', '-')}`;
 
   // Get system icon
-  const icon = getSystemIcon(system.name);
+  const icon = system.icon;
 
   // Create system HTML
   systemElement.innerHTML = `
@@ -263,20 +263,6 @@ function updateSystemElement(systemElement, system) {
     systemElement.style.borderColor = 'var(--border-color)';
     systemElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
   }
-}
-
-/**
- * Get the FontAwesome icon class for a system
- * @param {string} systemName - The name of the system
- * @returns {string} The icon class
- */
-function getSystemIcon(systemName) {
-  const iconMap = {
-    'Life Support': 'fas fa-lungs',
-    'Power': 'fas fa-bolt',
-    'Navigation': 'fas fa-compass'
-  };
-  return iconMap[systemName] || 'fas fa-cog';
 }
 
 /**

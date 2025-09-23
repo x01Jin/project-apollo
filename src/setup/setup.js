@@ -89,7 +89,7 @@ export async function initializeSetup() {
       card.className = 'selection-card system-card';
       card.dataset.systemName = system.name;
 
-      const icon = getSystemIcon(system.name);
+      const icon = system.icon;
       const isSelected = selectedSystems.includes(system);
 
       card.innerHTML = `
@@ -151,16 +151,6 @@ export async function initializeSetup() {
       }
 
       return card;
-    }
-
-    // Get system icon based on name
-    function getSystemIcon(systemName) {
-      const iconMap = {
-        'Life Support': 'fas fa-lungs',
-        'Power': 'fas fa-bolt',
-        'Navigation': 'fas fa-compass'
-      };
-      return iconMap[systemName] || 'fas fa-cog';
     }
 
     // Handle begin game button

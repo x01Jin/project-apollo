@@ -6,6 +6,7 @@
  */
 export const shields = {
   name: "Shields",
+  icon: "fas fa-shield-alt",
   caveat: "Absorbs damage from negative events to protect other systems.",
 
   /**

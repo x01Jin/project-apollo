@@ -6,6 +6,7 @@
  */
 export const navigation = {
   name: "Navigation",
+  icon: "fas fa-compass",
   caveat: "Handles ship positioning and rescue signals. Failure may delay rescue arrival.",
 
   /**
@@ -20,6 +21,13 @@ export const navigation = {
     if (navigationSystem) {
       // Deteriorate navigation by 20 points
       navigationSystem.health = Math.max(0, navigationSystem.health - 20);
+
+      // Check if Comms system is healthy and can counter the decrement
+      const commsSystem = updatedState.systems.find(sys => sys.name === "Comms");
+      if (commsSystem && commsSystem.health > 0) {
+        // Comms counters the turn decrement, so skip the turn logic
+        return updatedState;
+      }
 
       // Check navigation health and potentially prevent turn increase
       let chance = 0;

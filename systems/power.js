@@ -6,6 +6,7 @@
  */
 export const power = {
   name: "Power",
+  icon: "fas fa-bolt",
   caveat: "Provides energy to all systems. Low power increases deterioration rates of other systems.",
 
   /**
