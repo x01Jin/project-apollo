@@ -420,7 +420,19 @@ body {
     left: 5px;
     right: 5px;
     max-width: none;
+  }
+
+  .event-toast.stack-1 {
     top: 10px;
+  }
+  .event-toast.stack-2 {
+    top: 80px;
+  }
+  .event-toast.stack-3 {
+    top: 150px;
+  }
+  .event-toast.stack-4 {
+    top: 220px;
   }
 
   .event-toast-content {
