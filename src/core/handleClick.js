@@ -55,40 +55,26 @@ export async function handleClick(systemName, gameState, config) {
     let eventTriggered = null;
 
     if (isSystemDead) {
-      // Check if an interactive event is active - force recovery should be blocked
-      if (gameState.interactiveMode) {
-        console.log(
-          "Interactive event is active, ignoring force recovery attempt"
-        );
-        return gameState;
-      }
-      // Force recovery attempt for dead system
-      const recoverySuccess = Math.random() < 0.1; // 10% chance
+      // Use the dedicated force recovery module
+      const { attemptForceRecovery } = await import(
+        "../mechanics/forceRecovery.js"
+      );
+      updatedState = await attemptForceRecovery(
+        systemName,
+        updatedState,
+        config
+      );
 
-      if (recoverySuccess) {
-        // Successful recovery: restore to 50% health
-        targetSystem.health = 50;
-        updatedState.message = `${systemName} force recovery successful! Restored to 50% health.`;
-      } else {
-        // Failed recovery
-        updatedState.message = `${systemName} force recovery failed. System remains offline.`;
-      }
-
-      // Systems still deteriorate during recovery attempt
-      updatedState = deteriorateSystems(updatedState);
-
-      // Check for win/lose after deterioration
-      updatedState = checkWinLose(updatedState);
-
-      // Trigger random event if game not over
-      if (!updatedState.gameOver) {
-        const eventResult = await triggerEvent(updatedState, config);
-        updatedState = eventResult.state;
-        eventTriggered = eventResult.event;
-      }
-
-      // Final win/lose check
-      updatedState = checkWinLose(updatedState);
+      // Log the force recovery attempt
+      const uiOptions = {
+        eventToLog: `Force recovery attempted on ${systemName}`,
+        showToast: {
+          description: `Force recovery attempted on ${systemName}`,
+          isPositive: false, // Force recovery is a desperate action
+        },
+      };
+      updateUI(updatedState, config, uiOptions);
+      return updatedState; // Return early since UI was already updated
     } else {
       // Normal fix for alive system
       // Step 1: Fix the selected system

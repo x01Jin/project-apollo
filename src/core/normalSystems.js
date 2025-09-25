@@ -5,6 +5,8 @@
  * This parser provides UI rendering, interaction handling, and state updates for normal systems.
  */
 
+import { getDamageModifier } from "../mechanics/damageModifiers.js";
+
 /**
  * Renders a normal system element with health bar and fix button
  * @param {Object} system - The system object
@@ -116,40 +118,15 @@ export async function handleNormalInteraction(systemName, gameState, config) {
     let eventTriggered = null;
 
     if (isSystemDead) {
-      // Check if an interactive event is active - force recovery should be blocked
-      if (gameState.interactiveMode) {
-        console.log(
-          "Interactive event is active, ignoring force recovery attempt"
-        );
-        return gameState;
-      }
-      // Force recovery attempt for dead system
-      const recoverySuccess = Math.random() < 0.1; // 10% chance
-
-      if (recoverySuccess) {
-        // Successful recovery: restore to 50% health
-        targetSystem.health = 50;
-        updatedState.message = `${systemName} force recovery successful! Restored to 50% health.`;
-      } else {
-        // Failed recovery
-        updatedState.message = `${systemName} force recovery failed. System remains offline.`;
-      }
-
-      // Systems still deteriorate during recovery attempt
-      updatedState = deteriorateSystems(updatedState);
-
-      // Check for win/lose after deterioration
-      updatedState = checkWinLose(updatedState);
-
-      // Trigger random event if game not over
-      if (!updatedState.gameOver) {
-        const eventResult = await triggerEvent(updatedState, config);
-        updatedState = eventResult.state;
-        eventTriggered = eventResult.event;
-      }
-
-      // Final win/lose check
-      updatedState = checkWinLose(updatedState);
+      // Use the dedicated force recovery module
+      const { attemptForceRecovery } = await import(
+        "../mechanics/forceRecovery.js"
+      );
+      updatedState = await attemptForceRecovery(
+        systemName,
+        updatedState,
+        config
+      );
     } else {
       // Normal fix for alive system
       // Step 1: Fix the selected system
@@ -158,8 +135,11 @@ export async function handleNormalInteraction(systemName, gameState, config) {
       // Step 2: Advance to the next turn
       updatedState.turn += 1;
 
-      // Step 3: Apply system deterioration
-      updatedState = deteriorateSystems(updatedState);
+      // Step 3: Increment deterioration count for consistent timing
+      updatedState.deteriorationCount += 1;
+
+      // Step 4: Apply system deterioration
+      updatedState = await deteriorateSystems(updatedState);
 
       // Step 4: Check for win/lose before events (in case deterioration caused failure)
       updatedState = checkWinLose(updatedState);
@@ -203,11 +183,54 @@ export async function handleNormalInteraction(systemName, gameState, config) {
  * Updates a normal system during the deterioration phase
  * @param {Object} system - The system object
  * @param {Object} gameState - The current game state
- * @returns {Object} The updated game state
+ * @returns {Promise<Object>} The updated game state
  */
-export function updateNormalSystem(system, gameState) {
+export async function updateNormalSystem(system, gameState) {
+  let updatedState = { ...gameState };
+
+  // Allow system to update itself (e.g., add/remove damage modifiers)
+  if (typeof system.update === "function") {
+    updatedState = await system.update(updatedState);
+  }
+
+  // Check for deterioration damage modifier FIRST
+  const modifier = getDamageModifier(
+    system.name,
+    "deterioration",
+    updatedState
+  );
+
+  if (modifier === 0) {
+    // System is immune to deterioration - return unchanged state
+    return gameState;
+  }
+
+  // Only apply deterioration if not immune
   // Call the system's deteriorate method
-  return system.deteriorate(gameState);
+  updatedState = system.deteriorate(updatedState);
+
+  // Apply damage modifier if not immune
+  if (modifier < 1) {
+    const systemIndex = updatedState.systems.findIndex(
+      (sys) => sys.name === system.name
+    );
+    if (systemIndex !== -1) {
+      const originalHealth = gameState.systems[systemIndex].health;
+      const newHealth = updatedState.systems[systemIndex].health;
+      const damageTaken = originalHealth - newHealth;
+
+      // Apply modifier to damage
+      const modifiedDamage = Math.floor(damageTaken * modifier);
+      const actualDamage = damageTaken - modifiedDamage;
+
+      updatedState.systems[systemIndex].health = Math.max(
+        0,
+        originalHealth - actualDamage
+      );
+    }
+  }
+
+  return updatedState;
 }
 
 /**

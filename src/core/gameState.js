@@ -7,7 +7,7 @@
  * @param {Object} config - The game configuration object containing systems and events.
  * @returns {Object} The initial game state object.
  */
-export function createGameState(config) {
+export async function createGameState(config) {
   // Validate the config object to ensure it has the required properties
   if (!config || !config.systems || !Array.isArray(config.systems)) {
     throw new Error("Invalid config: systems array is required");
@@ -23,7 +23,7 @@ export function createGameState(config) {
   const maxTurns = systems.length * 5;
 
   // Initialize the game state object
-  const gameState = {
+  let gameState = {
     turn: 1, // Start at turn 1
     maxTurns: maxTurns, // Total turns until rescue (5 per system)
     systems: systems, // Array of system objects with health
@@ -31,7 +31,20 @@ export function createGameState(config) {
     win: false, // Flag to indicate if the player won
     message:
       "Welcome to the survival game! Maintain your systems until rescue arrives.", // Current game message
+    damageModifiers: [], // Array of active damage modifiers {systemName, modifier, type, turnsLeft}
+    deteriorationCount: 0, // Counter for deterioration cycles, independent of turn manipulation
   };
+
+  // Initialize active and passive systems
+  const { initializeActiveSystem } = await import("./activeSystems.js");
+  const { initializePassiveSystem } = await import("./passiveSystems.js");
+  for (const system of gameState.systems) {
+    if (system.type === "active") {
+      gameState = initializeActiveSystem(system, gameState);
+    } else if (system.type === "passive") {
+      gameState = initializePassiveSystem(system, gameState);
+    }
+  }
 
   // Additional initialization logic can be added here if needed
   // For example, setting up event probabilities or other state variables

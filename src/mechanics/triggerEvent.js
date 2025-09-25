@@ -9,6 +9,7 @@
  * @param {Object} config - The game configuration containing events arrays.
  * @returns {Object} The updated game state after applying any triggered event.
  */
+import { getDamageModifier } from "./damageModifiers.js";
 export async function triggerEvent(gameState, config) {
   // Validate inputs
   if (!gameState || !config) {
@@ -52,6 +53,9 @@ export async function triggerEvent(gameState, config) {
 
     // Apply the selected event if one was chosen
     if (selectedEvent) {
+      // Add isPositive flag to the event for UI detection
+      selectedEvent.isPositive = isPositive;
+
       // Check if this is an interactive event
       if (selectedEvent.interactive) {
         // Import interactive events module
@@ -78,7 +82,20 @@ export async function triggerEvent(gameState, config) {
         updatedState.message = selectedEvent.description;
 
         // Apply the event's effect to the game state
-        updatedState = await selectedEvent.apply(updatedState);
+        const stateAfterEventApplication = await selectedEvent.apply(
+          updatedState
+        );
+
+        // Apply damage modifiers for negative events
+        if (!isPositive) {
+          updatedState = applyDamageModifiersToEvent(
+            stateAfterEventApplication,
+            updatedState,
+            selectedEvent
+          );
+        } else {
+          updatedState = stateAfterEventApplication;
+        }
 
         // Allow systems to react to the event
         for (const system of updatedState.systems) {
@@ -109,4 +126,55 @@ export async function triggerEvent(gameState, config) {
     state: updatedState,
     event: triggeredEvent,
   };
+}
+
+/**
+ * Applies damage modifiers to negative event effects
+ * @param {Object} stateAfterEvent - State after event application
+ * @param {Object} stateBeforeEvent - State before event application
+ * @param {Object} event - The event that was applied
+ * @returns {Object} The updated game state with damage modifiers applied
+ */
+/**
+ * Applies damage modifiers to negative event effects
+ * @param {Object} stateAfterEvent - State after event application
+ * @param {Object} stateBeforeEvent - State before event application
+ * @param {Object} event - The event that was applied
+ * @returns {Object} The updated game state with damage modifiers applied
+ */
+function applyDamageModifiersToEvent(stateAfterEvent, stateBeforeEvent, event) {
+  let updatedState = { ...stateAfterEvent };
+
+  // Check each system for health changes and apply modifiers
+  for (let i = 0; i < updatedState.systems.length; i++) {
+    const system = updatedState.systems[i];
+    const originalHealth = stateBeforeEvent.systems[i].health;
+    const newHealth = system.health;
+
+    // If health decreased, apply damage modifier
+    if (newHealth < originalHealth) {
+      const damageTaken = originalHealth - newHealth;
+      const modifier = getDamageModifier(
+        system.name,
+        "negative_events",
+        updatedState
+      );
+
+      if (modifier === 0) {
+        // System is immune - restore full health
+        updatedState.systems[i].health = originalHealth;
+      } else if (modifier < 1) {
+        // Apply damage reduction
+        const modifiedDamage = Math.floor(damageTaken * modifier);
+        const actualDamage = damageTaken - modifiedDamage;
+        updatedState.systems[i].health = Math.max(
+          0,
+          originalHealth - actualDamage
+        );
+      }
+      // If modifier is 1, no change needed (full damage)
+    }
+  }
+
+  return updatedState;
 }

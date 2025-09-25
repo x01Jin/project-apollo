@@ -5,6 +5,8 @@
  * They can update game state and respond to events without player interaction.
  */
 
+import { getDamageModifier } from "../mechanics/damageModifiers.js";
+
 /**
  * Renders a passive system element (minimal UI, no interactive elements)
  * @param {Object} system - The system object
@@ -34,11 +36,6 @@ export function renderPassiveSystem(system, container) {
       </div>
     </div>
   `;
-
-  // Add custom styling for passive systems
-  container.style.borderColor = "var(--info-color)";
-  container.style.boxShadow = "0 0 8px rgba(0, 136, 255, 0.2)";
-  container.style.opacity = "0.8";
 
   return container;
 }
@@ -89,16 +86,18 @@ export function handlePassiveInteraction(system, gameState) {
  * @param {Object} gameState - The current game state
  * @returns {Object} The updated game state
  */
-export function updatePassiveSystem(system, gameState) {
-  // Check if system has a custom update method
+export async function updatePassiveSystem(system, gameState) {
+  let updatedState = { ...gameState };
+
+  // Allow system to update itself (e.g., add/remove damage modifiers)
   if (typeof system.update === "function") {
     try {
       // Call the system's custom update method
-      const result = system.update(gameState);
+      const result = await system.update(updatedState);
 
       // Ensure we return a valid game state
       if (result && typeof result === "object") {
-        return result;
+        updatedState = result;
       } else {
         console.warn(
           `Passive system ${system.name} update did not return a valid game state`
@@ -109,10 +108,47 @@ export function updatePassiveSystem(system, gameState) {
       console.error(`Error in passive system ${system.name} update:`, error);
       return gameState;
     }
-  } else {
-    // No custom update method - return unchanged state
-    return gameState;
   }
+
+  // Check for deterioration damage modifier if system has deteriorate method
+  if (typeof system.deteriorate === "function") {
+    const modifier = getDamageModifier(
+      system.name,
+      "deterioration",
+      updatedState
+    );
+
+    if (modifier === 0) {
+      // System is immune to deterioration
+      return updatedState;
+    }
+
+    // Call the system's deteriorate method
+    updatedState = system.deteriorate(updatedState);
+
+    // Apply damage modifier if not immune
+    if (modifier < 1) {
+      const systemIndex = updatedState.systems.findIndex(
+        (sys) => sys.name === system.name
+      );
+      if (systemIndex !== -1) {
+        const originalHealth = gameState.systems[systemIndex].health;
+        const newHealth = updatedState.systems[systemIndex].health;
+        const damageTaken = originalHealth - newHealth;
+
+        // Apply modifier to damage
+        const modifiedDamage = Math.floor(damageTaken * modifier);
+        const actualDamage = damageTaken - modifiedDamage;
+
+        updatedState.systems[systemIndex].health = Math.max(
+          0,
+          originalHealth - actualDamage
+        );
+      }
+    }
+  }
+
+  return updatedState;
 }
 
 /**

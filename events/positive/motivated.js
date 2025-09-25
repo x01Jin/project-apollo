@@ -9,6 +9,12 @@ export const motivated = {
   description:
     "Your crew is highly motivated! Select up to 2 systems to repair.",
 
+  // Event display configuration
+  display: {
+    showToast: true,
+    logEvent: true,
+  },
+
   /**
    * Applies the motivated event effect to the game state.
    * Enters system selection mode to allow player to choose systems to repair.
@@ -51,6 +57,7 @@ export const motivated = {
         message: "Select up to 2 systems to repair (damaged systems only)",
         systemFilter: (system) => system.health < 100, // Only damaged systems
         showCancelButton: false, // No cancel button for positive events
+        associatedEvent: motivated, // Pass the event for display configuration
       }
     );
 

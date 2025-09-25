@@ -13,6 +13,7 @@ export async function getConfig() {
   const { navigation } = await import("./systems/navigation.js");
   const { shields } = await import("./systems/shields.js");
   const { comms } = await import("./systems/comms.js");
+  const { protection } = await import("./systems/protection.js");
 
   // Import positive event configurations
   const { solarFlare } = await import("./events/positive/solarFlare.js");
@@ -26,7 +27,7 @@ export async function getConfig() {
   const { oxygenLeak } = await import("./events/negative/oxygenLeak.js");
 
   // Aggregate the imported data into arrays
-  const systems = [lifeSupport, power, navigation, shields, comms];
+  const systems = [lifeSupport, power, navigation, shields, comms, protection];
   const positiveEvents = [solarFlare, supplyCache, alienSignal, motivated];
   const negativeEvents = [meteorShower, powerSurge, oxygenLeak];
 

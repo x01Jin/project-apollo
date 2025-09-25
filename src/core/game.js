@@ -37,14 +37,14 @@ export async function initializeGame() {
     console.log("Selected events:", selectedEvents);
 
     // Create initial game state
-    let gameState = createGameState(config);
+    let gameState = await createGameState(config);
     console.log("Initial game state:", gameState);
 
     // Apply initial deterioration for turn 1
     const { deteriorateSystems } = await import(
       "../mechanics/deteriorateSystems.js"
     );
-    gameState = deteriorateSystems(gameState);
+    gameState = await deteriorateSystems(gameState);
 
     // Update UI with initial state (after deterioration)
     updateUI(gameState, config);
@@ -52,18 +52,6 @@ export async function initializeGame() {
     // Listen for interactive event completion
     document.addEventListener("interactiveEventCompleted", (event) => {
       gameState = event.detail.updatedState;
-
-      // Update button states after interactive event completion
-      const systemsContainer = document.querySelector(".systems-container");
-      if (systemsContainer) {
-        if (gameState.interactiveMode) {
-          const allButtons = systemsContainer.querySelectorAll(".fix-button");
-          allButtons.forEach((btn) => (btn.disabled = true));
-        } else {
-          const allButtons = systemsContainer.querySelectorAll(".fix-button");
-          allButtons.forEach((btn) => (btn.disabled = false));
-        }
-      }
     });
 
     // Listen for system selection events
@@ -150,27 +138,6 @@ export async function initializeGame() {
         // Update UI after any interaction
         const { updateUI } = await import("./updateUI.js");
         updateUI(gameState, config);
-
-        // Handle button states after interaction
-        if (gameState.gameOver) {
-          const allButtons = systemsContainer.querySelectorAll("button");
-          allButtons.forEach((btn) => {
-            btn.disabled = true;
-            if (btn.classList.contains("fix-button")) {
-              btn.classList.add("game-over");
-            }
-          });
-        }
-
-        // Disable buttons during interactive mode
-        if (gameState.interactiveMode) {
-          const allButtons = systemsContainer.querySelectorAll("button");
-          allButtons.forEach((btn) => (btn.disabled = true));
-        } else {
-          // Re-enable buttons when not in interactive mode
-          const allButtons = systemsContainer.querySelectorAll("button");
-          allButtons.forEach((btn) => (btn.disabled = false));
-        }
       });
     }
 
@@ -183,10 +150,16 @@ export async function initializeGame() {
     if (retryButton) {
       retryButton.addEventListener("click", async () => {
         // Reset game state
-        gameState = createGameState(config);
+        gameState = await createGameState(config);
+
+        // Reset the systems update tracking to allow deterioration on turn 1
+        const { resetSystemsUpdateTracking } = await import(
+          "../mechanics/deteriorateSystems.js"
+        );
+        resetSystemsUpdateTracking();
 
         // Apply initial deterioration for turn 1
-        gameState = deteriorateSystems(gameState);
+        gameState = await deteriorateSystems(gameState);
 
         // Clear event log and reset to initial state
         const eventLogContent = document.getElementById("event-log-content");

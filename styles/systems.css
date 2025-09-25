@@ -44,6 +44,19 @@
   border-color: var(--primary-color);
 }
 
+/* Active System Styles */
+.active-system {
+  border-color: #00ff88;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+/* Passive System Styles */
+.passive-system {
+  border-color: #800080;
+  box-shadow: 0 0 8px rgba(128, 0, 128, 0.2);
+  opacity: 0.8;
+}
+
 .system-header {
   display: flex;
   align-items: center;
@@ -197,49 +210,9 @@
   box-shadow: 0 0 30px rgba(0, 255, 255, 0.7), 0 12px 24px rgba(0, 0, 0, 0.5);
 }
 
-/* Protection System Shield Overlay */
-.protection-shield-overlay {
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1004;
-  pointer-events: none;
-  font-size: 3rem;
-  color: #00ffffff;
-  text-shadow: 0 0 10px #61ffffff;
-  animation: protection-shield-bounce 2s ease-in-out infinite;
-}
-
-@keyframes protection-shield-bounce {
-  0%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-}
-
-/* Active System Content */
+/* Active System Styles */
 .active-system-content {
   margin-top: 8px;
-}
-
-.protection-status {
-  margin-bottom: 8px;
-}
-
-.protection-active {
-  color: var(--success-color);
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.protection-cooldown {
-  color: var(--warning-color);
-  font-weight: 600;
-  font-size: 0.9rem;
 }
 
 .action-button {

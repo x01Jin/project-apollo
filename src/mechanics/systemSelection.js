@@ -18,6 +18,8 @@ export function enterSystemSelectionMode(gameState, config, options = {}) {
     message: options.message || "Select systems...",
     systemFilter: options.systemFilter || null,
     showCancelButton: options.showCancelButton !== false,
+    associatedEvent: options.associatedEvent || null, // Event that triggered this selection
+    config: config, // Store config for later use in confirmSystemSelection
   };
   updatedState.selectedSystems = [];
   updatedState.message = options.message || "Select systems...";
@@ -89,6 +91,8 @@ export async function confirmSystemSelection(gameState) {
 
   const selectedSystems = gameState.selectedSystems || [];
   const callback = gameState.systemSelectionOptions.callback;
+  const associatedEvent = gameState.systemSelectionOptions.associatedEvent;
+  const config = gameState.systemSelectionOptions.config; // Get stored config
   let updatedState = { ...gameState };
 
   if (callback && typeof callback === "function") {
@@ -107,7 +111,20 @@ export async function confirmSystemSelection(gameState) {
     updatedState.message = `Selected ${selectedSystems.length} system(s)`;
   }
 
-  updateUI(updatedState);
+  // Check if this was triggered by an event with display configuration
+  const uiOptions = {};
+  if (associatedEvent && associatedEvent.display) {
+    if (associatedEvent.display.logEvent) {
+      uiOptions.eventToLog = updatedState.message;
+    }
+    if (associatedEvent.display.showToast) {
+      uiOptions.showToast = {
+        description: updatedState.message,
+        isPositive: associatedEvent.isPositive,
+      };
+    }
+  }
+  updateUI(updatedState, config, uiOptions);
   return updatedState;
 }
 

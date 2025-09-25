@@ -1,14 +1,63 @@
 /**
  * Shields system module.
  * This module contains all data and functionality for the Shields system.
- * The Shields system absorbs damage from negative events to protect other systems.
- * It deteriorates moderately and provides damage mitigation when active.
+ * The Shields system provides damage reduction against negative events based on shields health.
+ * It deteriorates moderately and provides protection when active.
  */
 export const shields = {
   name: "Shields",
   type: "normal",
   icon: "fas fa-shield-alt",
-  caveat: "Absorbs damage from negative events to protect other systems.",
+  caveat:
+    "Provides damage reduction against negative events based on shields health.",
+
+  /**
+   * Updates shields each turn to apply damage modifiers for negative events.
+   * @param {Object} gameState - The current game state
+   * @returns {Object} The updated game state
+   */
+  async update(gameState) {
+    // Import damage modifier functions
+    const { addDamageModifier, removeDamageModifiers } = await import(
+      "../src/mechanics/damageModifiers.js"
+    );
+
+    let updatedState = { ...gameState };
+    const shieldsSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
+
+    if (shieldsSystem) {
+      // Remove existing shields damage modifiers
+      updatedState = removeDamageModifiers(updatedState, "Shields");
+
+      // Add new damage modifier based on shields health
+      if (shieldsSystem.health > 0) {
+        let modifier = 1; // No reduction by default
+
+        if (shieldsSystem.health >= 90) {
+          modifier = 0.5; // 50% damage reduction
+        } else if (shieldsSystem.health >= 75) {
+          modifier = 0.75; // 25% damage reduction
+        } else if (shieldsSystem.health >= 50) {
+          modifier = 0.9; // 10% damage reduction
+        }
+
+        // Only add modifier if it provides actual protection
+        if (modifier < 1) {
+          updatedState = addDamageModifier(
+            updatedState,
+            "all", // Protect all systems
+            modifier,
+            "negative_events", // Only protect against negative events
+            1 // Lasts for 1 turn (reapplied each turn)
+          );
+        }
+      }
+    }
+
+    return updatedState;
+  },
 
   /**
    * Deteriorates the shields system.
@@ -42,68 +91,6 @@ export const shields = {
 
     if (shieldsSystem) {
       shieldsSystem.health = 100;
-    }
-
-    return updatedState;
-  },
-
-  /**
-   * Handles event effects, providing damage absorption for negative events.
-   * @param {Object} state - The current game state after event application
-   * @param {Object} event - The event that was triggered
-   * @param {Object} config - The game configuration
-   * @param {Object} originalState - The game state before event application
-   * @returns {Object} The updated game state with shields protection applied
-   */
-  onEvent(state, event, config, originalState) {
-    const updatedState = { ...state };
-
-    // Check if this is a negative event
-    const isNegativeEvent = config.negativeEvents.some(
-      (negEvent) => negEvent === event
-    );
-
-    if (isNegativeEvent) {
-      // Calculate damage dealt to each system
-      const damages = updatedState.systems.map((sys, i) =>
-        Math.max(0, originalState.systems[i].health - sys.health)
-      );
-
-      const totalDamage = damages.reduce((sum, d) => sum + d, 0);
-
-      if (totalDamage > 0) {
-        const shieldsSystem = updatedState.systems.find(
-          (sys) => sys.name === this.name
-        );
-
-        if (shieldsSystem && shieldsSystem.health > 0) {
-          // Calculate absorption rate based on shields health
-          let absorptionRate = 0;
-          if (shieldsSystem.health >= 90) {
-            absorptionRate = 0.5;
-          } else if (shieldsSystem.health >= 75) {
-            absorptionRate = 0.25;
-          } else if (shieldsSystem.health >= 50) {
-            absorptionRate = 0.1;
-          }
-          // Absorb percentage of total damage
-          const absorption = totalDamage * absorptionRate;
-
-          // Distribute absorption proportionally to damaged systems
-          let remainingAbsorption = absorption;
-          for (let i = 0; i < updatedState.systems.length; i++) {
-            if (damages[i] > 0 && updatedState.systems[i].name !== this.name) {
-              const reduceAmount = Math.min(damages[i], remainingAbsorption);
-              updatedState.systems[i].health += reduceAmount;
-              remainingAbsorption -= reduceAmount;
-              if (remainingAbsorption <= 0) break;
-            }
-          }
-
-          // Damage shields by the amount absorbed
-          shieldsSystem.health = Math.max(0, shieldsSystem.health - absorption);
-        }
-      }
     }
 
     return updatedState;

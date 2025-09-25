@@ -15,10 +15,9 @@ export function showEventToast(event, config) {
   const toastIcon = document.querySelector(".event-icon");
 
   if (toast && toastTitle && toastDescription && toastIcon) {
-    // Determine if positive or negative event
-    const isPositive =
-      config.positiveEvents &&
-      config.positiveEvents.some((e) => e.description === event.description);
+    // Determine if positive or negative event based on event type from triggerEvent
+    // event.isPositive is set in triggerEvent.js when the event is triggered
+    const isPositive = event.isPositive === true;
 
     toastTitle.textContent = isPositive ? "Positive Event!" : "Negative Event!";
     toastDescription.textContent = event.description;

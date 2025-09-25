@@ -5,21 +5,24 @@
  * They can define their own UI rendering, interaction handling, and update logic.
  */
 
+import { getDamageModifier } from "../mechanics/damageModifiers.js";
+
 /**
  * Renders an active system element using the system's custom renderUI method
  * @param {Object} system - The system object with renderUI method
  * @param {HTMLElement} container - The container element to render into
+ * @param {Object} gameState - The current game state
  * @returns {HTMLElement} The rendered system element
  */
-export function renderActiveSystem(system, container) {
+export function renderActiveSystem(system, container, gameState) {
   container.className = "system";
   container.id = `system-${system.name.toLowerCase().replace(" ", "-")}`;
   container.setAttribute("data-system-name", system.name);
 
   // Check if system has a custom renderUI method
   if (typeof system.renderUI === "function") {
-    // Call the system's custom rendering method
-    return system.renderUI(container);
+    // Call the system's custom rendering method with gameState
+    return system.renderUI(container, gameState);
   } else {
     // Fallback rendering if no custom method provided
     renderDefaultActiveSystem(system, container);
@@ -61,12 +64,13 @@ function renderDefaultActiveSystem(system, container) {
  * Updates an existing active system element
  * @param {HTMLElement} systemElement - The existing system element to update
  * @param {Object} system - The system object with updated data
+ * @param {Object} gameState - The current game state
  */
-export function updateActiveSystemElement(systemElement, system) {
+export function updateActiveSystemElement(systemElement, system, gameState) {
   // Check if system has a custom updateUI method
   if (typeof system.updateUI === "function") {
-    // Call the system's custom update method
-    system.updateUI(systemElement);
+    // Call the system's custom update method with gameState
+    system.updateUI(systemElement, gameState);
   } else {
     // Default update behavior - could be extended based on system state
     updateDefaultActiveSystemElement(systemElement, system);
@@ -127,18 +131,20 @@ export async function handleActiveInteraction(
  * Updates an active system during the game loop
  * @param {Object} system - The system object
  * @param {Object} gameState - The current game state
- * @returns {Object} The updated game state
+ * @returns {Promise<Object>} The updated game state
  */
-export function updateActiveSystem(system, gameState) {
-  // Check if system has a custom update method
+export async function updateActiveSystem(system, gameState) {
+  let updatedState = { ...gameState };
+
+  // Allow system to update itself (e.g., add/remove damage modifiers)
   if (typeof system.update === "function") {
     try {
       // Call the system's custom update method
-      const result = system.update(gameState);
+      const result = await system.update(updatedState);
 
       // Ensure we return a valid game state
       if (result && typeof result === "object") {
-        return result;
+        updatedState = result;
       } else {
         console.warn(
           `System ${system.name} update did not return a valid game state`
@@ -149,10 +155,47 @@ export function updateActiveSystem(system, gameState) {
       console.error(`Error in ${system.name} update:`, error);
       return gameState;
     }
-  } else {
-    // No custom update method - return unchanged state
-    return gameState;
   }
+
+  // Check for deterioration damage modifier if system has deteriorate method
+  if (typeof system.deteriorate === "function") {
+    const modifier = getDamageModifier(
+      system.name,
+      "deterioration",
+      updatedState
+    );
+
+    if (modifier === 0) {
+      // System is immune to deterioration
+      return updatedState;
+    }
+
+    // Call the system's deteriorate method
+    updatedState = system.deteriorate(updatedState);
+
+    // Apply damage modifier if not immune
+    if (modifier < 1) {
+      const systemIndex = updatedState.systems.findIndex(
+        (sys) => sys.name === system.name
+      );
+      if (systemIndex !== -1) {
+        const originalHealth = gameState.systems[systemIndex].health;
+        const newHealth = updatedState.systems[systemIndex].health;
+        const damageTaken = originalHealth - newHealth;
+
+        // Apply modifier to damage
+        const modifiedDamage = Math.floor(damageTaken * modifier);
+        const actualDamage = damageTaken - modifiedDamage;
+
+        updatedState.systems[systemIndex].health = Math.max(
+          0,
+          originalHealth - actualDamage
+        );
+      }
+    }
+  }
+
+  return updatedState;
 }
 
 /**

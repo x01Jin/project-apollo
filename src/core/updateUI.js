@@ -35,6 +35,9 @@ export function updateUI(gameState, config = null, options = {}) {
     throw new Error("Invalid gameState: gameState is required");
   }
 
+  // Update the global gameState reference for systems that need it
+  window.gameState = gameState;
+
   // Update turn display and progress
   updateTurnDisplay(gameState);
 
@@ -49,13 +52,13 @@ export function updateUI(gameState, config = null, options = {}) {
     if (existingSystems.length === gameState.systems.length) {
       // Update existing system elements for smooth transitions
       gameState.systems.forEach((system, index) => {
-        updateSystemElement(existingSystems[index], system);
+        updateSystemElement(existingSystems[index], system, gameState);
       });
     } else {
       // Recreate all systems if count changed
       systemsContainer.innerHTML = "";
       gameState.systems.forEach((system) => {
-        const systemElement = createSystemElement(system);
+        const systemElement = createSystemElement(system, gameState);
         systemsContainer.appendChild(systemElement);
       });
     }
@@ -63,6 +66,9 @@ export function updateUI(gameState, config = null, options = {}) {
 
   // Update game over state and button management
   updateGameOverState(gameState);
+
+  // Dispatch event for systems to update their overlays
+  document.dispatchEvent(new CustomEvent("uiUpdated"));
 
   // Handle system selection mode
   if (gameState.systemSelectionMode) {
@@ -86,15 +92,20 @@ export function updateUI(gameState, config = null, options = {}) {
 /**
  * Create a system element for the UI
  * @param {Object} system - The system object with name, health, and caveat
+ * @param {Object} gameState - The current game state
  * @returns {HTMLElement} The created system element
  */
-function createSystemElement(system) {
+function createSystemElement(system, gameState) {
   // Delegate to appropriate parser based on system type
   switch (system.type || "normal") {
     case "normal":
       return renderNormalSystem(system, document.createElement("div"));
     case "active":
-      return renderActiveSystem(system, document.createElement("div"));
+      return renderActiveSystem(
+        system,
+        document.createElement("div"),
+        gameState
+      );
     case "passive":
       return renderPassiveSystem(system, document.createElement("div"));
     default:
@@ -107,15 +118,16 @@ function createSystemElement(system) {
  * Update an existing system element with new data
  * @param {HTMLElement} systemElement - The existing system element to update
  * @param {Object} system - The system object with updated data
+ * @param {Object} gameState - The current game state
  */
-function updateSystemElement(systemElement, system) {
+function updateSystemElement(systemElement, system, gameState) {
   // Delegate to appropriate parser based on system type
   switch (system.type || "normal") {
     case "normal":
       updateNormalSystemElement(systemElement, system);
       break;
     case "active":
-      updateActiveSystemElement(systemElement, system);
+      updateActiveSystemElement(systemElement, system, gameState);
       break;
     case "passive":
       updatePassiveSystemElement(systemElement, system);

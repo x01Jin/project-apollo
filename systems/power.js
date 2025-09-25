@@ -4,6 +4,10 @@
  * The Power system provides energy to all other systems.
  * It deteriorates slowly but affects overall ship functionality.
  */
+
+// Import damage modifier function
+import { getDamageModifier } from "../src/mechanics/damageModifiers.js";
+
 export const power = {
   name: "Power",
   type: "normal",
@@ -30,9 +34,26 @@ export const power = {
       if (powerSystem.health < 50) {
         updatedState.systems = updatedState.systems.map((system) => {
           if (system.name !== this.name) {
+            // Check for deterioration damage modifier
+            const modifier = getDamageModifier(
+              system.name,
+              "deterioration",
+              updatedState
+            );
+
+            if (modifier === 0) {
+              // System is immune to deterioration damage
+              return system;
+            }
+
+            // Apply damage with modifier
+            const baseDamage = 5;
+            const modifiedDamage = Math.floor(baseDamage * modifier);
+            const actualDamage = baseDamage - modifiedDamage;
+
             return {
               ...system,
-              health: Math.max(0, system.health - 5), // Extra 5 damage
+              health: Math.max(0, system.health - actualDamage),
             };
           }
           return system;

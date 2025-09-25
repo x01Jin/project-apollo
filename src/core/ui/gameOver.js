@@ -55,14 +55,18 @@ export function updateGameOverState(gameState) {
   // Abandon button is always enabled
   if (abandonButton) abandonButton.disabled = false;
 
-  // Update button states based on game over status (only affects normal systems)
-  const buttons = document.querySelectorAll(".fix-button");
+  // Update button states based on game over status
+  const buttons = document.querySelectorAll(
+    "button:not(#retry-button):not(#setup-button):not(#abandon-button)"
+  );
   buttons.forEach((button) => {
     button.disabled = gameState.gameOver;
-    if (gameState.gameOver) {
-      button.classList.add("game-over");
-    } else {
-      button.classList.remove("game-over");
+    if (button.classList.contains("fix-button")) {
+      if (gameState.gameOver) {
+        button.classList.add("game-over");
+      } else {
+        button.classList.remove("game-over");
+      }
     }
   });
 }
