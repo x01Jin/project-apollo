@@ -5,8 +5,6 @@
  * This parser provides UI rendering, interaction handling, and state updates for normal systems.
  */
 
-import { getDamageModifier } from "../mechanics/damageModifiers.js";
-
 /**
  * Renders a normal system element with health bar and fix button
  * @param {Object} system - The system object
@@ -102,12 +100,7 @@ export function updateNormalSystemElement(systemElement, system) {
 export async function handleNormalInteraction(systemName, gameState, config) {
   // Import required modules dynamically to avoid circular dependencies
   const { fixSystem } = await import("../mechanics/fixSystem.js");
-  const { deteriorateSystems } = await import(
-    "../mechanics/deteriorateSystems.js"
-  );
-  const { triggerEvent } = await import("../mechanics/triggerEvent.js");
-  const { checkWinLose } = await import("./checkWinLose.js");
-  const { updateUI } = await import("./updateUI.js");
+  const { executeTurnSequence } = await import("./sequenceOrder.js");
 
   let updatedState = { ...gameState };
 
@@ -122,7 +115,6 @@ export async function handleNormalInteraction(systemName, gameState, config) {
 
     // Check if system is dead (needs force recovery) or alive (normal fix)
     const isSystemDead = targetSystem.health <= 0;
-    let eventTriggered = null;
 
     if (isSystemDead) {
       // Use the dedicated force recovery module
@@ -139,36 +131,9 @@ export async function handleNormalInteraction(systemName, gameState, config) {
       // Step 1: Fix the selected system
       updatedState = fixSystem(updatedState, systemName);
 
-      // Step 2: Advance to the next turn
-      updatedState.turn += 1;
-
-      // Step 3: Increment deterioration count for consistent timing
-      updatedState.deteriorationCount += 1;
-
-      // Step 4: Apply system deterioration
-      updatedState = await deteriorateSystems(updatedState);
-
-      // Step 4: Check for win/lose before events (in case deterioration caused failure)
-      updatedState = checkWinLose(updatedState);
-
-      // Step 5: Trigger random event if game not over
-      if (!updatedState.gameOver) {
-        const eventResult = await triggerEvent(updatedState, config);
-        updatedState = eventResult.state;
-        eventTriggered = eventResult.event;
-      }
-
-      // Step 6: Final win/lose check
-      updatedState = checkWinLose(updatedState);
+      // Step 2-7: Execute the standard turn progression sequence
+      updatedState = await executeTurnSequence(updatedState, config);
     }
-
-    // Step 7: Update the UI with the new state
-    const uiOptions = {};
-    if (eventTriggered) {
-      uiOptions.eventToLog = eventTriggered.description;
-      uiOptions.showToast = eventTriggered;
-    }
-    updateUI(updatedState, config, uiOptions);
 
     // Log the action
     if (isSystemDead) {
@@ -200,54 +165,15 @@ export async function updateNormalSystem(system, gameState) {
     updatedState = await system.update(updatedState);
   }
 
-  // Check for deterioration damage modifier FIRST
-  const modifier = getDamageModifier(
-    system.name,
-    "deterioration",
-    updatedState
+  // Apply deterioration with damage modifier support
+  const { applySystemDeterioration } = await import(
+    "../mechanics/deteriorationUtils.js"
   );
-
-  if (modifier === 0) {
-    // System is immune to deterioration - return unchanged state
-    return gameState;
-  }
-
-  // Only apply deterioration if not immune
-  // Call the system's deteriorate method
-  updatedState = system.deteriorate(updatedState);
-
-  // Apply damage modifier if not immune
-  if (modifier < 1) {
-    const systemIndex = updatedState.systems.findIndex(
-      (sys) => sys.name === system.name
-    );
-    if (systemIndex !== -1) {
-      const originalHealth = gameState.systems[systemIndex].health;
-      const newHealth = updatedState.systems[systemIndex].health;
-      const damageTaken = originalHealth - newHealth;
-
-      // Apply modifier to damage
-      const modifiedDamage = Math.floor(damageTaken * modifier);
-      const actualDamage = damageTaken - modifiedDamage;
-
-      updatedState.systems[systemIndex].health = Math.max(
-        0,
-        originalHealth - actualDamage
-      );
-    }
-  }
-
-  // Check for critical failure after applying modifiers
-  const finalSystemIndex = updatedState.systems.findIndex(
-    (sys) => sys.name === system.name
+  updatedState = applySystemDeterioration(
+    system,
+    updatedState,
+    system.deteriorate
   );
-  if (finalSystemIndex !== -1) {
-    const finalHealth = updatedState.systems[finalSystemIndex].health;
-    if (system.critical && finalHealth <= 0) {
-      updatedState.gameOver = true;
-      updatedState.message = `${system.name} has failed! Game Over.`;
-    }
-  }
 
   return updatedState;
 }

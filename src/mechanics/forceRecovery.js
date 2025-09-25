@@ -12,11 +12,6 @@
  * @returns {Promise<Object>} The updated game state
  */
 export async function attemptForceRecovery(systemName, gameState, config) {
-  // Import required modules dynamically to avoid circular dependencies
-  const { deteriorateSystems } = await import("./deteriorateSystems.js");
-  const { triggerEvent } = await import("./triggerEvent.js");
-  const { checkWinLose } = await import("../core/checkWinLose.js");
-
   let updatedState = { ...gameState };
 
   // Find the target system
@@ -62,28 +57,9 @@ export async function attemptForceRecovery(systemName, gameState, config) {
     }
   }
 
-  // Follow the same sequence as normal system fixes:
-
-  // Step 1: Advance to the next turn (force recovery is a player action)
-  updatedState.turn += 1;
-
-  // Step 2: Increment deterioration count for consistent timing
-  updatedState.deteriorationCount += 1;
-
-  // Step 3: Apply system deterioration
-  updatedState = await deteriorateSystems(updatedState);
-
-  // Step 4: Check for win/lose after deterioration
-  updatedState = checkWinLose(updatedState);
-
-  // Step 5: Trigger random event if game not over
-  if (!updatedState.gameOver) {
-    const eventResult = await triggerEvent(updatedState, config);
-    updatedState = eventResult.state;
-  }
-
-  // Step 6: Final win/lose check
-  updatedState = checkWinLose(updatedState);
+  // Execute the standard turn progression sequence
+  const { executeTurnSequence } = await import("../core/sequenceOrder.js");
+  updatedState = await executeTurnSequence(updatedState, config);
 
   return updatedState;
 }

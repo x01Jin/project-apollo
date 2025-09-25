@@ -5,8 +5,6 @@
  * They can update game state and respond to events without player interaction.
  */
 
-import { getDamageModifier } from "../mechanics/damageModifiers.js";
-
 /**
  * Renders a passive system element (minimal UI, no interactive elements)
  * @param {Object} system - The system object
@@ -112,40 +110,14 @@ export async function updatePassiveSystem(system, gameState) {
 
   // Check for deterioration damage modifier if system has deteriorate method
   if (typeof system.deteriorate === "function") {
-    const modifier = getDamageModifier(
-      system.name,
-      "deterioration",
-      updatedState
+    const { applySystemDeterioration } = await import(
+      "../mechanics/deteriorationUtils.js"
     );
-
-    if (modifier === 0) {
-      // System is immune to deterioration
-      return updatedState;
-    }
-
-    // Call the system's deteriorate method
-    updatedState = system.deteriorate(updatedState);
-
-    // Apply damage modifier if not immune
-    if (modifier < 1) {
-      const systemIndex = updatedState.systems.findIndex(
-        (sys) => sys.name === system.name
-      );
-      if (systemIndex !== -1) {
-        const originalHealth = gameState.systems[systemIndex].health;
-        const newHealth = updatedState.systems[systemIndex].health;
-        const damageTaken = originalHealth - newHealth;
-
-        // Apply modifier to damage
-        const modifiedDamage = Math.floor(damageTaken * modifier);
-        const actualDamage = damageTaken - modifiedDamage;
-
-        updatedState.systems[systemIndex].health = Math.max(
-          0,
-          originalHealth - actualDamage
-        );
-      }
-    }
+    updatedState = applySystemDeterioration(
+      system,
+      updatedState,
+      system.deteriorate
+    );
   }
 
   return updatedState;
