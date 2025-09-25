@@ -6,8 +6,10 @@
  */
 export const comms = {
   name: "Comms",
+  type: "normal",
   icon: "fas fa-signal",
-  caveat: "Handles communication systems. Provides chance for extra turns and protects against navigation failures.",
+  caveat:
+    "Handles communication systems. Provides chance for extra turns and protects against navigation failures.",
 
   /**
    * Deteriorates the comms system.
@@ -16,7 +18,9 @@ export const comms = {
    */
   deteriorate(state) {
     const updatedState = { ...state };
-    const commsSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const commsSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (commsSystem) {
       // Deteriorate comms by 20 points
@@ -38,12 +42,14 @@ export const comms = {
    */
   fix(state) {
     const updatedState = { ...state };
-    const commsSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const commsSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (commsSystem) {
       commsSystem.health = 100;
     }
 
     return updatedState;
-  }
+  },
 };

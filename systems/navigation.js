@@ -6,8 +6,10 @@
  */
 export const navigation = {
   name: "Navigation",
+  type: "normal",
   icon: "fas fa-compass",
-  caveat: "Handles ship positioning and rescue signals. Failure may delay rescue arrival.",
+  caveat:
+    "Handles ship positioning and rescue signals. Failure may delay rescue arrival.",
 
   /**
    * Deteriorates the navigation system.
@@ -16,14 +18,18 @@ export const navigation = {
    */
   deteriorate(state) {
     const updatedState = { ...state };
-    const navigationSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const navigationSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (navigationSystem) {
       // Deteriorate navigation by 20 points
       navigationSystem.health = Math.max(0, navigationSystem.health - 20);
 
       // Check if Comms system is healthy and can counter the decrement
-      const commsSystem = updatedState.systems.find(sys => sys.name === "Comms");
+      const commsSystem = updatedState.systems.find(
+        (sys) => sys.name === "Comms"
+      );
       if (commsSystem && commsSystem.health > 0) {
         // Comms counters the turn decrement, so skip the turn logic
         return updatedState;
@@ -57,12 +63,14 @@ export const navigation = {
    */
   fix(state) {
     const updatedState = { ...state };
-    const navigationSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const navigationSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (navigationSystem) {
       navigationSystem.health = 100;
     }
 
     return updatedState;
-  }
+  },
 };

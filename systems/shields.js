@@ -6,6 +6,7 @@
  */
 export const shields = {
   name: "Shields",
+  type: "normal",
   icon: "fas fa-shield-alt",
   caveat: "Absorbs damage from negative events to protect other systems.",
 
@@ -16,7 +17,9 @@ export const shields = {
    */
   deteriorate(state) {
     const updatedState = { ...state };
-    const shieldsSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const shieldsSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (shieldsSystem) {
       // Deteriorate shields by 10 points
@@ -33,7 +36,9 @@ export const shields = {
    */
   fix(state) {
     const updatedState = { ...state };
-    const shieldsSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const shieldsSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (shieldsSystem) {
       shieldsSystem.health = 100;
@@ -54,7 +59,9 @@ export const shields = {
     const updatedState = { ...state };
 
     // Check if this is a negative event
-    const isNegativeEvent = config.negativeEvents.some(negEvent => negEvent === event);
+    const isNegativeEvent = config.negativeEvents.some(
+      (negEvent) => negEvent === event
+    );
 
     if (isNegativeEvent) {
       // Calculate damage dealt to each system
@@ -65,7 +72,9 @@ export const shields = {
       const totalDamage = damages.reduce((sum, d) => sum + d, 0);
 
       if (totalDamage > 0) {
-        const shieldsSystem = updatedState.systems.find(sys => sys.name === this.name);
+        const shieldsSystem = updatedState.systems.find(
+          (sys) => sys.name === this.name
+        );
 
         if (shieldsSystem && shieldsSystem.health > 0) {
           // Calculate absorption rate based on shields health
@@ -98,5 +107,5 @@ export const shields = {
     }
 
     return updatedState;
-  }
+  },
 };

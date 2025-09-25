@@ -12,26 +12,30 @@
  */
 export async function handleClick(systemName, gameState, config) {
   // Import required modules dynamically to avoid circular dependencies
-  const { fixSystem } = await import('../mechanics/fixSystem.js');
-  const { deteriorateSystems } = await import('../mechanics/deteriorateSystems.js');
-  const { triggerEvent } = await import('../mechanics/triggerEvent.js');
-  const { checkWinLose } = await import('./checkWinLose.js');
-  const { updateUI } = await import('./updateUI.js');
+  const { fixSystem } = await import("../mechanics/fixSystem.js");
+  const { deteriorateSystems } = await import(
+    "../mechanics/deteriorateSystems.js"
+  );
+  const { triggerEvent } = await import("../mechanics/triggerEvent.js");
+  const { checkWinLose } = await import("./checkWinLose.js");
+  const { updateUI } = await import("./updateUI.js");
 
   // Validate inputs
   if (!systemName || !gameState || !config) {
-    throw new Error('Invalid parameters: systemName, gameState, and config are required');
+    throw new Error(
+      "Invalid parameters: systemName, gameState, and config are required"
+    );
   }
 
   // Check if game is already over
   if (gameState.gameOver) {
-    console.log('Game is over, ignoring click');
+    console.log("Game is over, ignoring click");
     return gameState;
   }
 
   // Check if an interactive event is active
   if (gameState.interactiveMode) {
-    console.log('Interactive event is active, ignoring normal click');
+    console.log("Interactive event is active, ignoring normal click");
     return gameState;
   }
 
@@ -39,7 +43,9 @@ export async function handleClick(systemName, gameState, config) {
 
   try {
     // Find the target system
-    const targetSystem = updatedState.systems.find(system => system.name === systemName);
+    const targetSystem = updatedState.systems.find(
+      (system) => system.name === systemName
+    );
     if (!targetSystem) {
       throw new Error(`System '${systemName}' not found`);
     }
@@ -51,7 +57,9 @@ export async function handleClick(systemName, gameState, config) {
     if (isSystemDead) {
       // Check if an interactive event is active - force recovery should be blocked
       if (gameState.interactiveMode) {
-        console.log('Interactive event is active, ignoring force recovery attempt');
+        console.log(
+          "Interactive event is active, ignoring force recovery attempt"
+        );
         return gameState;
       }
       // Force recovery attempt for dead system
@@ -81,7 +89,6 @@ export async function handleClick(systemName, gameState, config) {
 
       // Final win/lose check
       updatedState = checkWinLose(updatedState);
-
     } else {
       // Normal fix for alive system
       // Step 1: Fix the selected system
@@ -121,9 +128,8 @@ export async function handleClick(systemName, gameState, config) {
     } else {
       console.log(`Turn ${updatedState.turn} completed`);
     }
-
   } catch (error) {
-    console.error('Error handling click:', error);
+    console.error("Error handling click:", error);
     // In case of error, return the original state
     return gameState;
   }

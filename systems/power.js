@@ -6,8 +6,10 @@
  */
 export const power = {
   name: "Power",
+  type: "normal",
   icon: "fas fa-bolt",
-  caveat: "Provides energy to all systems. Low power increases deterioration rates of other systems.",
+  caveat:
+    "Provides energy to all systems. Low power increases deterioration rates of other systems.",
 
   /**
    * Deteriorates the power system and applies effects to other systems if power is low.
@@ -16,7 +18,9 @@ export const power = {
    */
   deteriorate(state) {
     const updatedState = { ...state };
-    const powerSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const powerSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (powerSystem) {
       // Deteriorate power system by 10 points
@@ -24,11 +28,11 @@ export const power = {
 
       // If power is low (<50), increase deterioration of other systems
       if (powerSystem.health < 50) {
-        updatedState.systems = updatedState.systems.map(system => {
+        updatedState.systems = updatedState.systems.map((system) => {
           if (system.name !== this.name) {
             return {
               ...system,
-              health: Math.max(0, system.health - 5) // Extra 5 damage
+              health: Math.max(0, system.health - 5), // Extra 5 damage
             };
           }
           return system;
@@ -46,12 +50,14 @@ export const power = {
    */
   fix(state) {
     const updatedState = { ...state };
-    const powerSystem = updatedState.systems.find(sys => sys.name === this.name);
+    const powerSystem = updatedState.systems.find(
+      (sys) => sys.name === this.name
+    );
 
     if (powerSystem) {
       powerSystem.health = 100;
     }
 
     return updatedState;
-  }
+  },
 };

@@ -2,31 +2,31 @@
 
 /* Global scrollbar styling for main page scroll */
 html::-webkit-scrollbar {
-    width: 12px;
+  width: 6px;
 }
 
 html::-webkit-scrollbar-track {
-    background: var(--background-secondary);
-    border-radius: 6px;
+  background: var(--background-secondary);
+  border-radius: 6px;
 }
 
 html::-webkit-scrollbar-thumb {
-    background: var(--primary-color);
-    border-radius: 6px;
-    border: 2px solid var(--background-secondary);
+  background: var(--primary-color);
+  border-radius: 6px;
+  border: 2px solid var(--background-secondary);
 }
 
 html::-webkit-scrollbar-thumb:hover {
-    background: var(--secondary-color);
+  background: var(--secondary-color);
 }
 
 /* Firefox scrollbar styling */
 html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--primary-color) var(--background-secondary);
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--background-secondary);
 }
 
 /* Corner styling to hide the bottom-right corner */
 html::-webkit-scrollbar-corner {
-    background: var(--background-secondary);
+  background: var(--background-secondary);
 }

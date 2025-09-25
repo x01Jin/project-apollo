@@ -12,7 +12,7 @@
 export async function triggerEvent(gameState, config) {
   // Validate inputs
   if (!gameState || !config) {
-    throw new Error('Invalid parameters: gameState and config are required');
+    throw new Error("Invalid parameters: gameState and config are required");
   }
 
   // Create a copy of the gameState to avoid mutation
@@ -28,13 +28,25 @@ export async function triggerEvent(gameState, config) {
     const isPositive = Math.random() < 0.5;
     let selectedEvent;
 
-    if (isPositive && config.positiveEvents && config.positiveEvents.length > 0) {
+    if (
+      isPositive &&
+      config.positiveEvents &&
+      config.positiveEvents.length > 0
+    ) {
       // Select a random positive event
-      const randomIndex = Math.floor(Math.random() * config.positiveEvents.length);
+      const randomIndex = Math.floor(
+        Math.random() * config.positiveEvents.length
+      );
       selectedEvent = config.positiveEvents[randomIndex];
-    } else if (!isPositive && config.negativeEvents && config.negativeEvents.length > 0) {
+    } else if (
+      !isPositive &&
+      config.negativeEvents &&
+      config.negativeEvents.length > 0
+    ) {
       // Select a random negative event
-      const randomIndex = Math.floor(Math.random() * config.negativeEvents.length);
+      const randomIndex = Math.floor(
+        Math.random() * config.negativeEvents.length
+      );
       selectedEvent = config.negativeEvents[randomIndex];
     }
 
@@ -43,16 +55,20 @@ export async function triggerEvent(gameState, config) {
       // Check if this is an interactive event
       if (selectedEvent.interactive) {
         // Import interactive events module
-        const { showInteractiveEvent } = await import('./interactiveEvents.js');
+        const { showInteractiveEvent } = await import("./interactiveEvents.js");
 
         // Show interactive event popup instead of immediate application
-        updatedState = showInteractiveEvent(updatedState, config, selectedEvent);
+        updatedState = showInteractiveEvent(
+          updatedState,
+          config,
+          selectedEvent
+        );
 
         // Store the triggered event for return
         triggeredEvent = selectedEvent;
 
         // Log the interactive event for debugging
-        console.log('Interactive event triggered:', selectedEvent.description);
+        console.log("Interactive event triggered:", selectedEvent.description);
       } else {
         // Handle regular (non-interactive) events
         // Capture state before event application for system hooks
@@ -62,12 +78,17 @@ export async function triggerEvent(gameState, config) {
         updatedState.message = selectedEvent.description;
 
         // Apply the event's effect to the game state
-        updatedState = selectedEvent.apply(updatedState);
+        updatedState = await selectedEvent.apply(updatedState);
 
         // Allow systems to react to the event
         for (const system of updatedState.systems) {
           if (system.onEvent) {
-            updatedState = system.onEvent(updatedState, selectedEvent, config, stateBeforeEvent);
+            updatedState = system.onEvent(
+              updatedState,
+              selectedEvent,
+              config,
+              stateBeforeEvent
+            );
           }
         }
 
@@ -75,17 +96,17 @@ export async function triggerEvent(gameState, config) {
         triggeredEvent = selectedEvent;
 
         // Log the event for debugging
-        console.log('Event triggered:', selectedEvent.description);
+        console.log("Event triggered:", selectedEvent.description);
       }
     }
   } else {
     // No event triggered, update message accordingly
-    updatedState.message = 'No unusual events this turn.';
+    updatedState.message = "No unusual events this turn.";
   }
 
   // Return both the updated state and the triggered event (if any)
   return {
     state: updatedState,
-    event: triggeredEvent
+    event: triggeredEvent,
   };
 }

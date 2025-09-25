@@ -1,51 +1,50 @@
 /**
  * Update UI module for the survival game.
- * This module handles updating the user interface elements based on the current game state.
- * It refreshes the display of turn number, system health bars, messages, and button states.
- * The UI updates occur after each game state change to keep the player informed.
+ * This module orchestrates updating the user interface elements based on the current game state.
+ * It coordinates calls to specialized UI modules for different concerns.
  *
  * @param {Object} gameState - The current game state object.
  * @param {Object} config - The game configuration object.
  * @param {Object} options - Additional options for UI updates.
  */
+
+// Import system parsers synchronously (they should be available)
+import { renderNormalSystem } from "./normalSystems.js";
+import { renderActiveSystem } from "./activeSystems.js";
+import { renderPassiveSystem } from "./passiveSystems.js";
+
+// Import update functions synchronously
+import { updateNormalSystemElement } from "./normalSystems.js";
+import { updateActiveSystemElement } from "./activeSystems.js";
+import { updatePassiveSystemElement } from "./passiveSystems.js";
+
+// Import specialized UI modules
+import { updateTurnDisplay } from "./ui/turnDisplay.js";
+import { updateMessageDisplay } from "./ui/messageDisplay.js";
+import { updateGameOverState } from "./ui/gameOver.js";
+import { addEventToLog } from "./ui/eventLog.js";
+import { showEventToast } from "./ui/toast.js";
+import {
+  renderSystemSelectionMode,
+  removeSystemSelectionUI,
+} from "./ui/systemSelectionUI.js";
+
 export function updateUI(gameState, config = null, options = {}) {
   // Validate the gameState object
   if (!gameState) {
-    throw new Error('Invalid gameState: gameState is required');
+    throw new Error("Invalid gameState: gameState is required");
   }
 
-  // Update the turn display
-  const turnTextElement = document.getElementById('turn-text');
-  if (turnTextElement) {
-    turnTextElement.textContent = `Turn: ${gameState.turn} / ${gameState.maxTurns}`;
-  }
+  // Update turn display and progress
+  updateTurnDisplay(gameState);
 
-  // Update turn progress bar
-  const turnProgressBar = document.getElementById('turn-progress-bar');
-  if (turnProgressBar) {
-    const progress = (gameState.turn / gameState.maxTurns) * 100;
-    turnProgressBar.style.width = `${progress}%`;
-  }
-
-  // Update the message display
-  const messageElement = document.getElementById('message-display');
-  if (messageElement) {
-    const messageSpan = messageElement.querySelector('span');
-    if (messageSpan) {
-      messageSpan.textContent = gameState.message;
-    }
-  }
-
-  // Update header to reflect dynamic turns
-  const headerParagraph = document.querySelector('.game-header p');
-  if (headerParagraph) {
-    headerParagraph.textContent = `Maintain your ship's systems until rescue arrives in ${gameState.maxTurns} turns!`;
-  }
+  // Update message display
+  updateMessageDisplay(gameState);
 
   // Update system elements (preserve existing elements for smooth animations)
-  const systemsContainer = document.querySelector('.systems-container');
+  const systemsContainer = document.querySelector(".systems-container");
   if (systemsContainer) {
-    const existingSystems = systemsContainer.querySelectorAll('.system');
+    const existingSystems = systemsContainer.querySelectorAll(".system");
 
     if (existingSystems.length === gameState.systems.length) {
       // Update existing system elements for smooth transitions
@@ -54,70 +53,24 @@ export function updateUI(gameState, config = null, options = {}) {
       });
     } else {
       // Recreate all systems if count changed
-      systemsContainer.innerHTML = '';
-      gameState.systems.forEach(system => {
+      systemsContainer.innerHTML = "";
+      gameState.systems.forEach((system) => {
         const systemElement = createSystemElement(system);
         systemsContainer.appendChild(systemElement);
       });
     }
   }
 
-  // Update button states based on game over status
-  const buttons = document.querySelectorAll('.fix-button');
-  buttons.forEach(button => {
-    button.disabled = gameState.gameOver;
-    if (gameState.gameOver) {
-      button.classList.add('game-over');
-    } else {
-      button.classList.remove('game-over');
-    }
-  });
+  // Update game over state and button management
+  updateGameOverState(gameState);
 
-  // Handle game over state and button states
-  const gameOverElement = document.getElementById('game-over');
-  const retryButton = document.getElementById('retry-button');
-  const setupButton = document.getElementById('setup-button');
-  const abandonButton = document.getElementById('abandon-button');
-
-  if (gameState.gameOver) {
-    // Show game over message
-    const gameOverTitle = document.getElementById('game-over-title');
-    const gameOverMessage = document.getElementById('game-over-message');
-    const winIcon = document.querySelector('.win-icon');
-    const loseIcon = document.querySelector('.lose-icon');
-
-    if (gameOverElement && gameOverTitle && gameOverMessage) {
-      gameOverElement.style.display = 'block';
-
-      if (gameState.win) {
-        gameOverTitle.textContent = 'Survived!';
-        gameOverMessage.textContent = 'You successfully maintained your ship systems until rescue arrived!';
-        if (winIcon) winIcon.style.display = 'block';
-        if (loseIcon) loseIcon.style.display = 'none';
-      } else {
-        gameOverTitle.textContent = 'Failed!';
-        gameOverMessage.textContent = 'Your ship systems failed. Rescue could not reach you in time.';
-        if (winIcon) winIcon.style.display = 'none';
-        if (loseIcon) loseIcon.style.display = 'block';
-      }
-    }
-
-    // Enable retry and setup buttons when game is over
-    if (retryButton) retryButton.disabled = false;
-    if (setupButton) setupButton.disabled = false;
+  // Handle system selection mode
+  if (gameState.systemSelectionMode) {
+    renderSystemSelectionMode(gameState, config);
   } else {
-    // Hide game over message when game is not over
-    if (gameOverElement) {
-      gameOverElement.style.display = 'none';
-    }
-
-    // Disable retry and setup buttons when game is not over
-    if (retryButton) retryButton.disabled = true;
-    if (setupButton) setupButton.disabled = true;
+    // Remove selection mode UI if not in selection mode
+    removeSystemSelectionUI();
   }
-
-  // Abandon button is always enabled
-  if (abandonButton) abandonButton.disabled = false;
 
   // Add event to log if provided
   if (options.eventToLog) {
@@ -128,38 +81,6 @@ export function updateUI(gameState, config = null, options = {}) {
   if (options.showToast && config) {
     showEventToast(options.showToast, config);
   }
-
-  // Log UI update for debugging
-  console.log('UI updated with game state:', gameState);
-}
-
-/**
- * Add an event to the event log
- * @param {string} eventText - The event description to log
- * @param {number} turn - The current turn number
- */
-export function addEventToLog(eventText, turn) {
-  const eventLogContent = document.getElementById('event-log-content');
-  if (eventLogContent) {
-    const eventItem = document.createElement('div');
-    eventItem.className = 'event-item';
-
-    const eventTime = document.createElement('span');
-    eventTime.className = 'event-time';
-    eventTime.textContent = `Turn ${turn}`;
-
-    const eventTextSpan = document.createElement('span');
-    eventTextSpan.className = 'event-text';
-    eventTextSpan.textContent = eventText;
-
-    eventItem.appendChild(eventTime);
-    eventItem.appendChild(eventTextSpan);
-
-    eventLogContent.appendChild(eventItem);
-
-    // Auto-scroll to bottom
-    eventLogContent.scrollTop = eventLogContent.scrollHeight;
-  }
 }
 
 /**
@@ -168,143 +89,40 @@ export function addEventToLog(eventText, turn) {
  * @returns {HTMLElement} The created system element
  */
 function createSystemElement(system) {
-  const systemElement = document.createElement('div');
-  systemElement.className = 'system';
-  systemElement.id = `system-${system.name.toLowerCase().replace(' ', '-')}`;
-
-  // Get system icon
-  const icon = system.icon;
-
-  // Create system HTML
-  systemElement.innerHTML = `
-    <div class="system-header">
-      <i class="${icon} system-icon"></i>
-      <h3>${system.name}</h3>
-    </div>
-    <div class="health-bar-container">
-      <div class="health-bar"></div>
-      <div class="health-bar-overlay"></div>
-    </div>
-    <div class="health-text">Health: ${system.health}/100</div>
-    <div class="caveat">${system.caveat}</div>
-    <button class="fix-button" data-system="${system.name}">
-      <i class="fas fa-wrench"></i> Fix
-    </button>
-  `;
-
-  // Update health bar styling
-  const healthBar = systemElement.querySelector('.health-bar');
-  if (healthBar) {
-    healthBar.style.width = `${system.health}%`;
-
-    // Update health bar color based on health with gradient
-    const healthPercent = system.health / 100;
-    if (healthPercent > 0.6) {
-      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 50%, #00ff88 100%)';
-    } else if (healthPercent > 0.3) {
-      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 70%, #ffff00 100%)';
-    } else {
-      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ff4444 100%)';
-    }
-
-    // Add critical system warning
-    if (system.health < 20) {
-      systemElement.style.borderColor = 'var(--danger-color)';
-      systemElement.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.5)';
-    } else if (system.health < 50) {
-      systemElement.style.borderColor = 'var(--warning-color)';
-      systemElement.style.boxShadow = '0 0 10px rgba(255, 255, 0, 0.3)';
-    } else {
-      systemElement.style.borderColor = 'var(--border-color)';
-      systemElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
-    }
+  // Delegate to appropriate parser based on system type
+  switch (system.type || "normal") {
+    case "normal":
+      return renderNormalSystem(system, document.createElement("div"));
+    case "active":
+      return renderActiveSystem(system, document.createElement("div"));
+    case "passive":
+      return renderPassiveSystem(system, document.createElement("div"));
+    default:
+      console.warn(`Unknown system type: ${system.type}, defaulting to normal`);
+      return renderNormalSystem(system, document.createElement("div"));
   }
-
-  return systemElement;
 }
 
 /**
- * Update an existing system element with new health data
+ * Update an existing system element with new data
  * @param {HTMLElement} systemElement - The existing system element to update
- * @param {Object} system - The system object with updated name, health, and caveat
+ * @param {Object} system - The system object with updated data
  */
 function updateSystemElement(systemElement, system) {
-  // Update health bar width (this will animate smoothly due to CSS transition)
-  const healthBar = systemElement.querySelector('.health-bar');
-  if (healthBar) {
-    healthBar.style.width = `${system.health}%`;
-
-    // Update health bar color based on health with gradient
-    const healthPercent = system.health / 100;
-    if (healthPercent > 0.6) {
-      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 50%, #00ff88 100%)';
-    } else if (healthPercent > 0.3) {
-      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ffff00 70%, #ffff00 100%)';
-    } else {
-      healthBar.style.background = 'linear-gradient(90deg, #ff4444 0%, #ff4444 100%)';
-    }
-  }
-
-  // Update health text
-  const healthText = systemElement.querySelector('.health-text');
-  if (healthText) {
-    healthText.textContent = `Health: ${system.health}/100`;
-  }
-
-  // Update caveat text (in case it changed)
-  const caveatElement = systemElement.querySelector('.caveat');
-  if (caveatElement) {
-    caveatElement.textContent = system.caveat;
-  }
-
-  // Update critical system warning styling
-  if (system.health < 20) {
-    systemElement.style.borderColor = 'var(--danger-color)';
-    systemElement.style.boxShadow = '0 0 15px rgba(255, 68, 68, 0.5)';
-  } else if (system.health < 50) {
-    systemElement.style.borderColor = 'var(--warning-color)';
-    systemElement.style.boxShadow = '0 0 10px rgba(255, 255, 0, 0.3)';
-  } else {
-    systemElement.style.borderColor = 'var(--border-color)';
-    systemElement.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)';
-  }
-}
-
-/**
- * Show an event toast notification
- * @param {Object} event - The event object containing type and description
- * @param {Object} config - The game configuration
- */
-export function showEventToast(event, config) {
-  const toast = document.getElementById('event-toast');
-  const toastTitle = document.getElementById('event-toast-title');
-  const toastDescription = document.getElementById('event-toast-description');
-  const toastIcon = document.querySelector('.event-icon');
-
-  if (toast && toastTitle && toastDescription && toastIcon) {
-    // Determine if positive or negative event
-    const isPositive = config.positiveEvents && config.positiveEvents.some(e => e.description === event.description);
-
-    toastTitle.textContent = isPositive ? 'Positive Event!' : 'Negative Event!';
-    toastDescription.textContent = event.description;
-
-    // Update icon and colors
-    if (isPositive) {
-      toastIcon.className = 'fas fa-star event-icon';
-      toastIcon.style.color = 'var(--success-color)';
-      toast.style.borderLeft = '4px solid var(--success-color)';
-    } else {
-      toastIcon.className = 'fas fa-exclamation-triangle event-icon';
-      toastIcon.style.color = 'var(--danger-color)';
-      toast.style.borderLeft = '4px solid var(--danger-color)';
-    }
-
-    // Show toast
-    toast.style.display = 'block';
-
-    // Auto-hide after 4 seconds
-    setTimeout(() => {
-      toast.style.display = 'none';
-    }, 4000);
+  // Delegate to appropriate parser based on system type
+  switch (system.type || "normal") {
+    case "normal":
+      updateNormalSystemElement(systemElement, system);
+      break;
+    case "active":
+      updateActiveSystemElement(systemElement, system);
+      break;
+    case "passive":
+      updatePassiveSystemElement(systemElement, system);
+      break;
+    default:
+      console.warn(`Unknown system type: ${system.type}, defaulting to normal`);
+      updateNormalSystemElement(systemElement, system);
+      break;
   }
 }
