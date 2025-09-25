@@ -16,7 +16,6 @@ export async function initializeGame() {
     const { getConfig } = await import("../../config.js");
     const { createGameState } = await import("./gameState.js");
     const { updateUI } = await import("./updateUI.js");
-    const { handleClick } = await import("./handleClick.js");
 
     // Get URL parameters for selected systems and events
     const urlParams = new URLSearchParams(window.location.search);
@@ -70,7 +69,10 @@ export async function initializeGame() {
     // Listen for system selection events
     document.addEventListener("systemSelected", async (event) => {
       const { selectSystem } = await import("../mechanics/systemSelection.js");
-      gameState = await selectSystem(gameState, event.detail.systemName);
+      gameState = selectSystem(gameState, event.detail.systemName);
+
+      // Update UI with the new state
+      updateUI(gameState, config);
 
       // Dispatch custom event with current selection state
       const selectionEvent = new CustomEvent("systemSelectionChanged", {

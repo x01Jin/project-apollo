@@ -70,10 +70,14 @@ export function selectSystem(gameState, systemName) {
       ];
     }
   } else {
-    updatedState.selectedSystems = [systemName];
+    // For single select, allow deselection by clicking selected system
+    if (updatedState.selectedSystems.includes(systemName)) {
+      updatedState.selectedSystems = [];
+    } else {
+      updatedState.selectedSystems = [systemName];
+    }
   }
 
-  updateUI(updatedState);
   return updatedState;
 }
 

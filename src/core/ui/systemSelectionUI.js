@@ -14,6 +14,7 @@ export function renderSystemSelectionMode(gameState, config) {
     overlay = document.createElement("div");
     overlay.id = "system-selection-overlay";
     overlay.className = "system-selection-overlay";
+    overlay.style.pointerEvents = "none";
     document.body.appendChild(overlay);
   }
 
@@ -34,7 +35,9 @@ export function renderSystemSelectionMode(gameState, config) {
     : `Selected: ${selectedCount} system${selectedCount !== 1 ? "s" : ""}`;
 
   const buttonsHtml =
-    '<button class="system-selection-confirm">Confirm</button>' +
+    `<button class="system-selection-confirm" ${
+      selectedCount === 0 ? "disabled" : ""
+    }>Confirm</button>` +
     (options.showCancelButton
       ? '<button class="system-selection-cancel">Cancel</button>'
       : "");
