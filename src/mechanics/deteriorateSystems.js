@@ -72,8 +72,10 @@ export async function deteriorateSystems(gameState, force = false) {
   }
 
   // Update the game's message to inform the player about deterioration
-  updatedState.message =
-    "Systems have deteriorated due to lack of maintenance.";
+  if (!updatedState.gameOver) {
+    updatedState.message =
+      "Systems have deteriorated due to lack of maintenance.";
+  }
 
   // Debug logging to track system changes during development
   console.log("Systems updated:", updatedState.systems);

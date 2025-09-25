@@ -97,6 +97,15 @@ export async function triggerEvent(gameState, config) {
           updatedState = stateAfterEventApplication;
         }
 
+        // Check for critical system failures after event damage
+        for (const system of updatedState.systems) {
+          if (system.critical && system.health <= 0 && !updatedState.gameOver) {
+            updatedState.gameOver = true;
+            updatedState.message = `${system.name} has failed! Game Over.`;
+            break; // Only need to check until first critical failure
+          }
+        }
+
         // Allow systems to react to the event
         for (const system of updatedState.systems) {
           if (system.onEvent) {

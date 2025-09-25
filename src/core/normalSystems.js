@@ -34,7 +34,7 @@ export function renderNormalSystem(system, container) {
     <div class="health-text">Health: ${system.health}/100</div>
     <div class="caveat">${system.caveat}</div>
     <button class="fix-button" data-system="${system.name}">
-      <i class="fas fa-wrench"></i> Fix
+      <i class="fas fa-wrench"></i> ${system.health <= 0 ? "Recover" : "Fix"}
     </button>
   `;
 
@@ -79,6 +79,13 @@ export function updateNormalSystemElement(systemElement, system) {
   const caveatElement = systemElement.querySelector(".caveat");
   if (caveatElement) {
     caveatElement.textContent = system.caveat;
+  }
+
+  // Update button text based on health
+  const fixButton = systemElement.querySelector(".fix-button");
+  if (fixButton) {
+    const buttonText = system.health <= 0 ? "Recover" : "Fix";
+    fixButton.innerHTML = `<i class="fas fa-wrench"></i> ${buttonText}`;
   }
 
   // Update critical system warning styling
@@ -227,6 +234,18 @@ export async function updateNormalSystem(system, gameState) {
         0,
         originalHealth - actualDamage
       );
+    }
+  }
+
+  // Check for critical failure after applying modifiers
+  const finalSystemIndex = updatedState.systems.findIndex(
+    (sys) => sys.name === system.name
+  );
+  if (finalSystemIndex !== -1) {
+    const finalHealth = updatedState.systems[finalSystemIndex].health;
+    if (system.critical && finalHealth <= 0) {
+      updatedState.gameOver = true;
+      updatedState.message = `${system.name} has failed! Game Over.`;
     }
   }
 

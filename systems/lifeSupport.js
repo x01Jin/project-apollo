@@ -8,11 +8,12 @@ export const lifeSupport = {
   name: "Life Support",
   type: "normal",
   icon: "fas fa-lungs",
+  critical: true,
   caveat:
     "Critical for survival. If this system fails completely, the game ends immediately.",
 
   /**
-   * Deteriorates the life support system and checks for critical failure.
+   * Deteriorates the life support system.
    * @param {Object} state - The current game state
    * @returns {Object} The updated game state
    */
@@ -25,12 +26,6 @@ export const lifeSupport = {
     if (lifeSupportSystem) {
       // Deteriorate life support by 15 points
       lifeSupportSystem.health = Math.max(0, lifeSupportSystem.health - 15);
-
-      // Check for critical failure
-      if (lifeSupportSystem.health <= 0) {
-        updatedState.gameOver = true;
-        updatedState.message = "Life Support has failed! Game Over.";
-      }
     }
 
     return updatedState;

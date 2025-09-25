@@ -49,6 +49,17 @@ export async function attemptForceRecovery(systemName, gameState, config) {
   } else {
     // Failed recovery
     updatedState.message = `${systemName} force recovery failed. System remains offline.`;
+
+    // Trigger shake animation on the system element
+    const systemElement = document.querySelector(
+      `[data-system-name="${systemName}"]`
+    );
+    if (systemElement) {
+      systemElement.classList.add("shake");
+      setTimeout(() => {
+        systemElement.classList.remove("shake");
+      }, 500);
+    }
   }
 
   // Follow the same sequence as normal system fixes:
