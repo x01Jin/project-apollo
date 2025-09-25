@@ -12,14 +12,14 @@
 export function fixSystem(gameState, systemName) {
   // Validate inputs
   if (!gameState || !gameState.systems) {
-    throw new Error('Invalid gameState: systems array is required');
+    throw new Error("Invalid gameState: systems array is required");
   }
-  if (!systemName || typeof systemName !== 'string') {
-    throw new Error('Invalid systemName: must be a non-empty string');
+  if (!systemName || typeof systemName !== "string") {
+    throw new Error("Invalid systemName: must be a non-empty string");
   }
 
   // Find the system to fix
-  const system = gameState.systems.find(system => system.name === systemName);
+  const system = gameState.systems.find((system) => system.name === systemName);
 
   // Check if the system exists
   if (!system) {

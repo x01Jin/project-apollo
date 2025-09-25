@@ -14,10 +14,10 @@ export const alienSignal = {
   apply(state) {
     const updatedState = { ...state };
     // Heal all systems by 15 points using alien technology, capped at 100
-    updatedState.systems = updatedState.systems.map(system => ({
+    updatedState.systems = updatedState.systems.map((system) => ({
       ...system,
-      health: Math.min(100, system.health + 15)
+      health: Math.min(100, system.health + 15),
     }));
     return updatedState;
-  }
+  },
 };

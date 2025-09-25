@@ -1,85 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Game Setup - Project Apollo</title>
-    <link rel="stylesheet" href="styles/setup.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="styles/setup.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">LOADING SYSTEMS</div>
-        <div class="loading-subtitle">Initializing ship configuration...</div>
+      <div class="loading-spinner"></div>
+      <div class="loading-text">LOADING SYSTEMS</div>
+      <div class="loading-subtitle">Initializing ship configuration...</div>
     </div>
 
     <div class="setup-container">
-        <div class="left-panel">
-            <header class="setup-header">
-                <h1><i class="fas fa-sliders-h"></i> Game Setup</h1>
-                <p>Customize your survival challenge</p>
-            </header>
+      <div class="left-panel">
+        <header class="setup-header">
+          <h1><i class="fas fa-sliders-h"></i> Game Setup</h1>
+          <p>Customize your survival challenge</p>
+        </header>
 
-            <div class="setup-main">
-                <div class="setup-section">
-                    <h2><i class="fas fa-cogs"></i> Ship Systems</h2>
-                    <p class="section-description">Select 3-8 systems to maintain. Each system adds 5 turns to rescue time.</p>
-                    <div class="selection-grid" id="systems-grid">
-                        <!-- Systems will be populated by JavaScript -->
-                    </div>
-                    <div class="selection-count">
-                        <span id="systems-count">0</span> systems selected (minimum 3, maximum 8)
-                    </div>
-                </div>
-
-                <div class="setup-section">
-                    <h2><i class="fas fa-random"></i> Random Events</h2>
-                    <p class="section-description">Choose which events can occur during gameplay</p>
-                    <div class="selection-grid" id="events-grid">
-                        <!-- Events will be populated by JavaScript -->
-                    </div>
-                    <div class="selection-count">
-                        <span id="events-count">0</span> events selected
-                    </div>
-                </div>
+        <div class="setup-main">
+          <div class="setup-section">
+            <h2><i class="fas fa-cogs"></i> Ship Systems</h2>
+            <p class="section-description">
+              Select 3-8 systems to maintain. Each system adds 5 turns to rescue
+              time.
+            </p>
+            <div class="selection-grid" id="systems-grid">
+              <!-- Systems will be populated by JavaScript -->
             </div>
+            <div class="selection-count">
+              <span id="systems-count">0</span> systems selected (minimum 3,
+              maximum 8)
+            </div>
+          </div>
+
+          <div class="setup-section">
+            <h2><i class="fas fa-random"></i> Random Events</h2>
+            <p class="section-description">
+              Choose which events can occur during gameplay
+            </p>
+            <div class="selection-grid" id="events-grid">
+              <!-- Events will be populated by JavaScript -->
+            </div>
+            <div class="selection-count">
+              <span id="events-count">0</span> events selected
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="setup-summary">
+          <h3><i class="fas fa-calculator"></i> Game Summary</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span>Rescue Time:</span>
+              <span id="rescue-time">0 turns</span>
+            </div>
+            <div class="summary-item">
+              <span>Systems to Maintain:</span>
+              <span id="selected-systems">None</span>
+            </div>
+            <div class="summary-item">
+              <span>Possible Events:</span>
+              <span id="selected-events">None</span>
+            </div>
+          </div>
         </div>
 
-        <div class="right-panel">
-            <div class="setup-summary">
-                <h3><i class="fas fa-calculator"></i> Game Summary</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <span>Rescue Time:</span>
-                        <span id="rescue-time">0 turns</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Systems to Maintain:</span>
-                        <span id="selected-systems">None</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Possible Events:</span>
-                        <span id="selected-events">None</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="setup-actions">
-                <a href="index.html" class="back-button">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-                <button id="begin-game-button" class="begin-button" disabled>
-                    <i class="fas fa-play"></i> Begin Game
-                </button>
-            </div>
+        <div class="setup-actions">
+          <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back
+          </a>
+          <button id="begin-game-button" class="begin-button" disabled>
+            <i class="fas fa-play"></i> Begin Game
+          </button>
         </div>
+      </div>
     </div>
 
     <script type="module">
-        import { initializeSetup } from './src/setup/setup.js';
-        initializeSetup();
+      import { initializeSetup } from "./src/setup/setup.js";
+      initializeSetup();
     </script>
-</body>
+  </body>
 </html>

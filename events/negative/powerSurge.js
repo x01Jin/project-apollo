@@ -14,7 +14,7 @@ export const powerSurge = {
   apply(state) {
     const updatedState = { ...state };
     // Damage all systems by 20 points, but power system takes extra damage
-    updatedState.systems = updatedState.systems.map(system => {
+    updatedState.systems = updatedState.systems.map((system) => {
       if (system.name === "Power") {
         return { ...system, health: Math.max(0, system.health - 40) };
       } else {
@@ -22,5 +22,5 @@ export const powerSurge = {
       }
     });
     return updatedState;
-  }
+  },
 };

@@ -17,5 +17,5 @@ export const supplyCache = {
     const randomIndex = Math.floor(Math.random() * updatedState.systems.length);
     updatedState.systems[randomIndex].health = 100;
     return updatedState;
-  }
+  },
 };

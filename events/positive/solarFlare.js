@@ -14,10 +14,10 @@ export const solarFlare = {
   apply(state) {
     const updatedState = { ...state };
     // Heal all systems by 20 points, capped at 100
-    updatedState.systems = updatedState.systems.map(system => ({
+    updatedState.systems = updatedState.systems.map((system) => ({
       ...system,
-      health: Math.min(100, system.health + 20)
+      health: Math.min(100, system.health + 20),
     }));
     return updatedState;
-  }
+  },
 };

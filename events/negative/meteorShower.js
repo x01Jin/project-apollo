@@ -14,10 +14,10 @@ export const meteorShower = {
   apply(state) {
     const updatedState = { ...state };
     // Damage all systems by 30 points
-    updatedState.systems = updatedState.systems.map(system => ({
+    updatedState.systems = updatedState.systems.map((system) => ({
       ...system,
-      health: Math.max(0, system.health - 30)
+      health: Math.max(0, system.health - 30),
     }));
     return updatedState;
-  }
+  },
 };

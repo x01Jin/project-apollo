@@ -14,10 +14,15 @@ export const oxygenLeak = {
   apply(state) {
     const updatedState = { ...state };
     // Find life support system and damage it heavily
-    const lifeSupportIndex = updatedState.systems.findIndex(system => system.name === "Life Support");
+    const lifeSupportIndex = updatedState.systems.findIndex(
+      (system) => system.name === "Life Support"
+    );
     if (lifeSupportIndex !== -1) {
-      updatedState.systems[lifeSupportIndex].health = Math.max(0, updatedState.systems[lifeSupportIndex].health - 50);
+      updatedState.systems[lifeSupportIndex].health = Math.max(
+        0,
+        updatedState.systems[lifeSupportIndex].health - 50
+      );
     }
     return updatedState;
-  }
+  },
 };

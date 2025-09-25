@@ -11,18 +11,20 @@
 export function checkWinLose(gameState) {
   // Validate the gameState object
   if (!gameState || !gameState.systems || !Array.isArray(gameState.systems)) {
-    throw new Error('Invalid gameState: systems array is required');
+    throw new Error("Invalid gameState: systems array is required");
   }
 
   // Create a copy of the gameState to avoid mutation
   const updatedState = { ...gameState };
 
   // Check for loss condition: ALL systems have 0 or less health
-  const allSystemsFailed = updatedState.systems.every(system => system.health <= 0);
+  const allSystemsFailed = updatedState.systems.every(
+    (system) => system.health <= 0
+  );
   if (allSystemsFailed) {
     updatedState.gameOver = true;
     updatedState.win = false;
-    updatedState.message = 'All ship systems have failed! Game Over.';
+    updatedState.message = "All ship systems have failed! Game Over.";
     return updatedState;
   }
 
@@ -30,7 +32,7 @@ export function checkWinLose(gameState) {
   if (updatedState.turn >= updatedState.maxTurns) {
     updatedState.gameOver = true;
     updatedState.win = true;
-    updatedState.message = 'Rescue has arrived! You survived! Congratulations!';
+    updatedState.message = "Rescue has arrived! You survived! Congratulations!";
     return updatedState;
   }
 

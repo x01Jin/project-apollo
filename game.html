@@ -1,94 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Project Apollo Game</title>
-    <link rel="stylesheet" href="styles/game.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="styles/game.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">INITIALIZING GAME</div>
-        <div class="loading-subtitle">Loading ship systems and preparing the disaster...</div>
+      <div class="loading-spinner"></div>
+      <div class="loading-text">INITIALIZING GAME</div>
+      <div class="loading-subtitle">
+        Loading ship systems and preparing the disaster...
+      </div>
     </div>
 
     <div class="game-container">
-        <div class="left-panel">
-            <header class="game-header">
-                <h1><i class="fas fa-rocket"></i> Project Apollo</h1>
-                <p>Maintain your ship's systems until rescue arrives in 0 turns!</p>
-            </header>
+      <div class="left-panel">
+        <header class="game-header">
+          <h1><i class="fas fa-rocket"></i> Project Apollo</h1>
+          <p>Maintain your ship's systems until rescue arrives in 0 turns!</p>
+        </header>
 
-            <div class="systems-container">
-                <!-- Systems will be populated dynamically by JavaScript -->
-            </div>
-
-            <div class="game-stats">
-                <div class="turn-display">
-                    <div class="turn-progress">
-                        <div class="turn-progress-bar" id="turn-progress-bar"></div>
-                    </div>
-                    <span id="turn-text">Turn: 1 / 15</span>
-                </div>
-            </div>
-
-            <div class="message-display" id="message-display">
-                <i class="fas fa-info-circle"></i>
-                <span>Welcome to the survival game! Maintain your systems until rescue arrives.</span>
-            </div>
+        <div class="systems-container">
+          <!-- Systems will be populated dynamically by JavaScript -->
         </div>
 
-        <div class="right-panel">
-            <div class="event-log" id="event-log">
-                <h4><i class="fas fa-history"></i> Event Log</h4>
-                <div class="event-log-content" id="event-log-content">
-                    <div class="event-item">
-                        <span class="event-time">Turn 1</span>
-                        <span class="event-text">Game started</span>
-                    </div>
-                </div>
+        <div class="game-stats">
+          <div class="turn-display">
+            <div class="turn-progress">
+              <div class="turn-progress-bar" id="turn-progress-bar"></div>
             </div>
-
-            <div id="game-over" class="game-over" style="display: none;">
-                <div class="game-over-content">
-                    <i class="fas fa-trophy win-icon"></i>
-                    <i class="fas fa-skull-crossbones lose-icon"></i>
-                    <h2 id="game-over-title"></h2>
-                    <p id="game-over-message"></p>
-                </div>
-            </div>
-
-            <div class="game-action-buttons">
-                <button id="retry-button" class="action-button retry-button" disabled>
-                    <i class="fas fa-redo"></i> Retry
-                </button>
-                <button id="setup-button" class="action-button setup-button" disabled>
-                    <i class="fas fa-cog"></i> Setup
-                </button>
-                <button id="abandon-button" class="action-button abandon-button">
-                    <i class="fas fa-times"></i> Abandon
-                </button>
-            </div>
+            <span id="turn-text">Turn: 1 / 15</span>
+          </div>
         </div>
+
+        <div class="message-display" id="message-display">
+          <i class="fas fa-info-circle"></i>
+          <span
+            >Welcome to the survival game! Maintain your systems until rescue
+            arrives.</span
+          >
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="event-log" id="event-log">
+          <h4><i class="fas fa-history"></i> Event Log</h4>
+          <div class="event-log-content" id="event-log-content">
+            <div class="event-item">
+              <span class="event-time">Turn 1</span>
+              <span class="event-text">Game started</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="game-over" class="game-over" style="display: none">
+          <div class="game-over-content">
+            <i class="fas fa-trophy win-icon"></i>
+            <i class="fas fa-skull-crossbones lose-icon"></i>
+            <h2 id="game-over-title"></h2>
+            <p id="game-over-message"></p>
+          </div>
+        </div>
+
+        <div class="game-action-buttons">
+          <button id="retry-button" class="action-button retry-button" disabled>
+            <i class="fas fa-redo"></i> Retry
+          </button>
+          <button id="setup-button" class="action-button setup-button" disabled>
+            <i class="fas fa-cog"></i> Setup
+          </button>
+          <button id="abandon-button" class="action-button abandon-button">
+            <i class="fas fa-times"></i> Abandon
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Event notification toast -->
-    <div id="event-toast" class="event-toast" style="display: none;">
-        <div class="event-toast-content">
-            <i class="fas fa-exclamation-triangle event-icon"></i>
-            <div class="event-toast-text">
-                <h4 id="event-toast-title"></h4>
-                <p id="event-toast-description"></p>
-            </div>
+    <div id="event-toast" class="event-toast" style="display: none">
+      <div class="event-toast-content">
+        <i class="fas fa-exclamation-triangle event-icon"></i>
+        <div class="event-toast-text">
+          <h4 id="event-toast-title"></h4>
+          <p id="event-toast-description"></p>
         </div>
+      </div>
     </div>
 
     <script type="module">
-        import { initializeGame } from './src/core/game.js';
-        initializeGame();
+      import { initializeGame } from "./src/core/game.js";
+      initializeGame();
     </script>
-</body>
+  </body>
 </html>
