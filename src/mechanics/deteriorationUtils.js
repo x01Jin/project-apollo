@@ -20,6 +20,11 @@ export function applySystemDeterioration(
 ) {
   let updatedState = { ...gameState };
 
+  // Skip deterioration for systems that were fixed on the previous turn
+  if (system.lastFixedTurn === updatedState.turn - 1) {
+    return updatedState;
+  }
+
   // Get damage modifier for deterioration
   const modifier = getDamageModifier(
     system.name,

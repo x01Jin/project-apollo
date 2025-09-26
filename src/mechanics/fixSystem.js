@@ -29,6 +29,14 @@ export function fixSystem(gameState, systemName) {
   // Call the system's fix function
   const updatedState = system.fix(gameState);
 
+  // Update the system's lastFixedTurn to current turn
+  const systemIndex = updatedState.systems.findIndex(
+    (sys) => sys.name === systemName
+  );
+  if (systemIndex !== -1) {
+    updatedState.systems[systemIndex].lastFixedTurn = updatedState.turn;
+  }
+
   // Update the game message to reflect the repair
   updatedState.message = `${systemName} has been repaired to full health.`;
 

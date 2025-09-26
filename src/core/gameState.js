@@ -14,10 +14,20 @@ export async function createGameState(config) {
   }
 
   // Clone the systems from config and add health property
-  const systems = config.systems.map((system) => ({
-    ...system,
-    health: 100, // All systems start at full health
-  }));
+  const systems = config.systems.map((system) => {
+    // Normal systems start with random health between 50-100
+    // Active and passive systems start at full health for balance
+    const initialHealth =
+      system.type === "normal"
+        ? Math.floor(Math.random() * 51) + 50 // Random between 50-100
+        : 100; // Active and passive systems start at 100%
+
+    return {
+      ...system,
+      health: initialHealth,
+      lastFixedTurn: 0, // Track when system was last fixed (0 = never fixed)
+    };
+  });
 
   // Calculate max turns based on number of systems (5 turns per system)
   const maxTurns = systems.length * 5;

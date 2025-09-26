@@ -203,6 +203,11 @@
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.5), 0 8px 16px rgba(0, 0, 0, 0.4);
   border-color: var(--primary-color);
   transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.system-selection-active {
+  user-select: none;
 }
 
 .system-selectable:hover {
