@@ -13,7 +13,7 @@ export async function initializeGame() {
       loadingOverlay.classList.remove("hidden");
     }
     // Import required modules
-    const { getConfig } = await import("../../config.js");
+    const { loadGameModules } = await import("../../registry.js");
     const { createGameState } = await import("./gameState.js");
     const { updateUI } = await import("./updateUI.js");
 
@@ -23,8 +23,8 @@ export async function initializeGame() {
     const selectedEvents =
       urlParams.get("events")?.split("|").map(decodeURIComponent) || [];
 
-    // Load full game configuration
-    const fullConfig = await getConfig();
+    // Load full game configuration using new registry system
+    const fullConfig = await loadGameModules();
 
     // Filter config based on user selections
     const config = filterConfigBySelections(

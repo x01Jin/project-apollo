@@ -66,7 +66,7 @@ src/
 
 systems/           # Individual system modules
 events/            # Event modules (positive/negative)
-config.js          # Central configuration aggregator
+registry.js        # Advanced module registry with caching and validation
 ```
 
 ### Data-Driven Systems
@@ -85,21 +85,26 @@ Each game element (systems and events) is defined as an independent module with 
 - Implement apply() methods for state modifications
 - Support both positive and negative outcomes
 
-### Configuration System
+### Module Registry System
 
-The `config.js` file serves as the central registry:
+The `registry.js` file provides an advanced module management system:
 
-- Imports all system and event modules
-- Aggregates them into structured arrays
-- Enables easy addition of new content without code changes
-- Supports selective loading based on player choices
-
+- **Dynamic Loading**: Uses ES6 dynamic imports for efficient module loading
+- **Interface Validation**: Validates module structure and required methods
+- **Performance Caching**: Caches loaded modules to improve performance
+- **Error Handling**: Comprehensive error handling with detailed logging
+- **Type Safety**: Supports strict mode for development and validation
+- **Static Hosting Compatible**: Works without file system scanning
+  
 ### Benefits of This Architecture
 
-- **Extensibility**: New systems/events can be added by creating modules and registering them in config.js
+- **Extensibility**: New systems/events can be added by creating modules and registering them in registry.js
 - **Maintainability**: Each module handles one responsibility
 - **Testability**: Isolated modules can be unit tested independently
 - **Modularity**: Changes to one system don't affect others
+- **Performance**: Module caching reduces loading times and improves user experience
+- **Reliability**: Comprehensive error handling and validation ensures system stability
+- **Developer Experience**: Detailed logging and debugging information for development
 
 Events add unpredictability and strategic depth, requiring players to adapt their repair priorities based on current circumstances.
 
@@ -120,7 +125,7 @@ project-apollo/
 ├── index.html          # Landing page
 ├── setup.html          # Game configuration
 ├── game.html           # Main game interface
-├── config.js           # Central module registry
+├── registry.js         # module registry with caching and validation
 ├── src/                # Core game logic
 ├── systems/            # System definitions
 ├── events/             # Event definitions
@@ -132,14 +137,14 @@ project-apollo/
 
 **To add a new system:**
 
-1. Create `systems/newSystem.js` with supported methods
-2. Register in `config.js`
+1. Create `systems/newSystem.js` with required properties (name, type) and methods (deteriorate, fix)
+2. Add the module path to the systems array in `registry.js`
 
 **To add a new event:**
 
 1. Create `events/positive/newEvent.js` or `events/negative/newEvent.js`
-2. Define description and apply() method
-3. Register in `config.js`
+2. Define required properties (description) and optional apply() method
+3. Add the module path to the appropriate events array in `registry.js`
 
 ### Development Workflow
 
@@ -147,8 +152,8 @@ This project follows a modular workflow design:
 
 1. **Core Logic** in `src/` remains generic and unchanged
 2. **Game Content** is added via modules in dedicated folders
-3. **Configuration** is managed through `config.js` registry
-4. **Testing** is performed on isolated modules
+3. **Module Management** is handled through `registry.js` with dynamic loading and validation
+4. **Testing** can be performed on isolated modules using the registry's test utilities
 
 ## Contributing
 

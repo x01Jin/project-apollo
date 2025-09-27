@@ -11,9 +11,9 @@ export async function initializeSetup() {
     if (loadingOverlay) {
       loadingOverlay.classList.remove("hidden");
     }
-    // Get all available systems and events from config
-    const { getConfig } = await import("../../config.js");
-    const config = await getConfig();
+    // Get all available systems and events from registry
+    const { loadGameModules } = await import("../../registry.js");
+    const config = await loadGameModules();
 
     // Available systems and events
     const availableSystems = config.systems;

@@ -35,9 +35,6 @@ export function updateUI(gameState, config = null, options = {}) {
     throw new Error("Invalid gameState: gameState is required");
   }
 
-  // Update the global gameState reference for systems that need it
-  window.gameState = gameState;
-
   // Update turn display and progress
   updateTurnDisplay(gameState);
 
