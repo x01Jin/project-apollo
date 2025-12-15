@@ -57,16 +57,19 @@ export function renderSystemSelectionMode(gameState, config) {
   const confirmBtn = controls.querySelector(".system-selection-confirm");
   const cancelBtn = controls.querySelector(".system-selection-cancel");
 
-  confirmBtn.addEventListener("click", () => {
-    const event = new CustomEvent("systemSelectionConfirmed");
-    document.dispatchEvent(event);
-  });
+  // Use onclick assignment to avoid adding duplicate listeners on subsequent renders
+  if (confirmBtn) {
+    confirmBtn.onclick = () => {
+      const event = new CustomEvent("systemSelectionConfirmed");
+      document.dispatchEvent(event);
+    };
+  }
 
   if (cancelBtn) {
-    cancelBtn.addEventListener("click", () => {
+    cancelBtn.onclick = () => {
       const event = new CustomEvent("systemSelectionCancelled");
       document.dispatchEvent(event);
-    });
+    };
   }
 
   updateSystemSelectability(gameState);
@@ -80,11 +83,15 @@ export function updateSystemSelectability(gameState) {
   const options = gameState.systemSelectionOptions;
   const selectedSystems = gameState.selectedSystems || [];
 
+  // Build a map of systems by name to avoid O(n^2) find calls
+  const systemMap = new Map();
+  (gameState.systems || []).forEach((s) => systemMap.set(s.name, s));
+
   systems.forEach((systemEl) => {
     const systemName = systemEl.dataset.systemName;
     if (!systemName) return;
 
-    const system = gameState.systems.find((s) => s.name === systemName);
+    const system = systemMap.get(systemName);
     if (!system) return;
 
     const isAllowed =

@@ -45,9 +45,21 @@ function createAndShowToast(event) {
     .toString(36)
     .substr(2, 9)}`;
 
-  // Clone the base toast element
-  const baseToast = document.getElementById("event-toast");
-  if (!baseToast) return;
+  // Clone the base toast element (if missing, create an off-DOM template)
+  let baseToast = document.getElementById("event-toast");
+  if (!baseToast) {
+    // Create a minimal template to allow toasts to work without a page-provided template
+    baseToast = document.createElement("div");
+    baseToast.id = "event-toast";
+    baseToast.style.display = "none";
+    baseToast.innerHTML = `
+      <div id="event-toast-title"></div>
+      <div id="event-toast-description"></div>
+      <i class="event-icon"></i>
+    `;
+    // Do not append template to document to avoid ID collisions
+    // console.debug('Toast: using internal template');
+  }
 
   const toast = baseToast.cloneNode(true);
   toast.id = toastId;

@@ -29,6 +29,10 @@ import {
   removeSystemSelectionUI,
 } from "./ui/systemSelectionUI.js";
 
+// Cache frequently used DOM elements to avoid querying every update
+let cachedSystemsContainer = null;
+// Toggle debug profiling via window.DEBUG_UI = true
+const shouldProfileUI = typeof window !== "undefined" && window.DEBUG_UI === true;
 export function updateUI(gameState, config = null, options = {}) {
   // Validate the gameState object
   if (!gameState) {
@@ -42,8 +46,13 @@ export function updateUI(gameState, config = null, options = {}) {
   updateMessageDisplay(gameState);
 
   // Update system elements (preserve existing elements for smooth animations)
-  const systemsContainer = document.querySelector(".systems-container");
+  if (!cachedSystemsContainer) {
+    cachedSystemsContainer = document.querySelector(".systems-container");
+  }
+
+  const systemsContainer = cachedSystemsContainer;
   if (systemsContainer) {
+    const start = shouldProfileUI ? performance.now() : 0;
     const existingSystems = systemsContainer.querySelectorAll(".system");
 
     if (existingSystems.length === gameState.systems.length) {
@@ -52,12 +61,19 @@ export function updateUI(gameState, config = null, options = {}) {
         updateSystemElement(existingSystems[index], system, gameState);
       });
     } else {
-      // Recreate all systems if count changed
-      systemsContainer.innerHTML = "";
+      // Recreate all systems if count changed; build a fragment then append
+      const frag = document.createDocumentFragment();
       gameState.systems.forEach((system) => {
         const systemElement = createSystemElement(system, gameState);
-        systemsContainer.appendChild(systemElement);
+        frag.appendChild(systemElement);
       });
+      systemsContainer.innerHTML = "";
+      systemsContainer.appendChild(frag);
+    }
+
+    if (shouldProfileUI) {
+      const duration = performance.now() - start;
+      console.debug(`updateUI systems update took ${duration.toFixed(2)}ms`);
     }
   }
 

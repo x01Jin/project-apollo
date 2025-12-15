@@ -36,12 +36,21 @@ export function renderNormalSystem(system, container) {
     }" data-system="${system.name}"${
     system.disableFixButton ? " disabled" : ""
   }>
-      <i class="fas fa-wrench"></i> ${system.health <= 0 ? "Recover" : "Fix"}
+      <i class="fas fa-wrench"></i> <span class="fix-button-text">${
+        system.health <= 0 ? "Recover" : "Fix"
+      }</span>
     </button>
   `;
 
   // Update health bar styling
   updateHealthBarStyling(container, system.health);
+
+  // Cache frequently used element references to avoid repeated querySelector calls
+  const healthBar = container.querySelector(".health-bar");
+  const healthText = container.querySelector(".health-text");
+  const caveatElement = container.querySelector(".caveat");
+  const fixButton = container.querySelector(".fix-button");
+  container._refs = { healthBar, healthText, caveatElement, fixButton };
 
   return container;
 }
@@ -53,47 +62,49 @@ export function renderNormalSystem(system, container) {
  */
 export function updateNormalSystemElement(systemElement, system) {
   // Update health bar width (this will animate smoothly due to CSS transition)
-  const healthBar = systemElement.querySelector(".health-bar");
-  if (healthBar) {
-    healthBar.style.width = `${system.health}%`;
+  const healthBarRef = systemElement._refs?.healthBar || systemElement.querySelector(".health-bar");
+  if (healthBarRef) {
+    healthBarRef.style.width = `${system.health}%`;
 
     // Update health bar color based on health with gradient
     const healthPercent = system.health / 100;
     if (healthPercent > 0.6) {
-      healthBar.style.background =
+      healthBarRef.style.background =
         "linear-gradient(90deg, #ff4444 0%, #ffff00 50%, #00ff88 100%)";
     } else if (healthPercent > 0.3) {
-      healthBar.style.background =
+      healthBarRef.style.background =
         "linear-gradient(90deg, #ff4444 0%, #ffff00 70%, #ffff00 100%)";
     } else {
-      healthBar.style.background =
+      healthBarRef.style.background =
         "linear-gradient(90deg, #ff4444 0%, #ff4444 100%)";
     }
   }
 
   // Update health text
-  const healthText = systemElement.querySelector(".health-text");
-  if (healthText) {
-    healthText.textContent = `Health: ${system.health}/100`;
+  const healthTextRef = systemElement._refs?.healthText || systemElement.querySelector(".health-text");
+  if (healthTextRef) {
+    healthTextRef.textContent = `Health: ${system.health}/100`;
   }
 
   // Update caveat text (in case it changed)
-  const caveatElement = systemElement.querySelector(".caveat");
-  if (caveatElement) {
-    caveatElement.textContent = system.caveat;
+  const caveatRef = systemElement._refs?.caveatElement || systemElement.querySelector(".caveat");
+  if (caveatRef) {
+    caveatRef.textContent = system.caveat;
   }
 
   // Update button text based on health
-  const fixButton = systemElement.querySelector(".fix-button");
-  if (fixButton) {
+  const fixButtonRef = systemElement._refs?.fixButton || systemElement.querySelector(".fix-button");
+  if (fixButtonRef) {
     const buttonText = system.health <= 0 ? "Recover" : "Fix";
-    fixButton.innerHTML = `<i class="fas fa-wrench"></i> ${buttonText}`;
+    const textSpan = fixButtonRef.querySelector(".fix-button-text");
+    if (textSpan) textSpan.textContent = buttonText;
+
     if (system.disableFixButton) {
-      fixButton.setAttribute("disabled", "disabled");
-      fixButton.classList.add("fix-button-disabled");
+      fixButtonRef.setAttribute("disabled", "disabled");
+      fixButtonRef.classList.add("fix-button-disabled");
     } else {
-      fixButton.removeAttribute("disabled");
-      fixButton.classList.remove("fix-button-disabled");
+      fixButtonRef.removeAttribute("disabled");
+      fixButtonRef.classList.remove("fix-button-disabled");
     }
   }
 

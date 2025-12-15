@@ -150,10 +150,10 @@ export const protection = {
           "protection" // Source identifier
         );
 
-        // Immediately update protection overlay
-        setTimeout(() => {
+        // Immediately update protection overlay (use rAF to batch with render)
+        requestAnimationFrame(() => {
           this.updateProtectionOverlay(updatedState);
-        }, 0);
+        });
 
         updatedState.message = `Protection activated! ${targetSystemName} is now protected for 3 turns!`;
         return updatedState;

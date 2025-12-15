@@ -90,10 +90,12 @@ export async function initializeGame() {
         // Handle different types of system interactions
         const target = event.target;
 
-        // Check for fix buttons (normal systems)
-        if (target.classList.contains("fix-button")) {
+        // Check for fix buttons (normal systems). Use `closest` so clicks
+        // on child elements (icons/spans inside the button) are also handled.
+        const fixButton = target.closest && target.closest(".fix-button");
+        if (fixButton) {
           event.preventDefault();
-          const systemName = target.dataset.system;
+          const systemName = fixButton.dataset.system;
 
           // Import normal systems handler
           const { handleNormalInteraction } = await import(
