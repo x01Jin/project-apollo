@@ -31,7 +31,11 @@ export function renderNormalSystem(system, container) {
     </div>
     <div class="health-text">Health: ${system.health}/100</div>
     <div class="caveat">${system.caveat}</div>
-    <button class="fix-button" data-system="${system.name}">
+    <button class="fix-button${
+      system.disableFixButton ? " fix-button-disabled" : ""
+    }" data-system="${system.name}"${
+    system.disableFixButton ? " disabled" : ""
+  }>
       <i class="fas fa-wrench"></i> ${system.health <= 0 ? "Recover" : "Fix"}
     </button>
   `;
@@ -84,6 +88,13 @@ export function updateNormalSystemElement(systemElement, system) {
   if (fixButton) {
     const buttonText = system.health <= 0 ? "Recover" : "Fix";
     fixButton.innerHTML = `<i class="fas fa-wrench"></i> ${buttonText}`;
+    if (system.disableFixButton) {
+      fixButton.setAttribute("disabled", "disabled");
+      fixButton.classList.add("fix-button-disabled");
+    } else {
+      fixButton.removeAttribute("disabled");
+      fixButton.classList.remove("fix-button-disabled");
+    }
   }
 
   // Update critical system warning styling
