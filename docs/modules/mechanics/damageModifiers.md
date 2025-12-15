@@ -6,7 +6,7 @@ Functions:
 
 - `addDamageModifier(gameState, systemName, modifier, type, turnsLeft, source)` — add a temporary modifier; `modifier` multiplies damage (0 = immune).
 - `updateDamageModifiers(gameState)` — decrement `turnsLeft` for each modifier and remove expired ones; emits `damageModifiersUpdated` event on changes.
-- `getDamageModifier(systemName, damageType, gameState)` — returns effective multiplier (1 = full damage).
+- `getDamageModifier(systemName, damageType, gameState)` — returns effective multiplier (1 = full damage). Supports global modifiers that target `all` systems (e.g., shields).
 - `isSystemImmune(systemName, damageType, gameState)` — true when effective modifier is 0.
 - `removeDamageModifiers` / `removeDamageModifiersBySource` — clean up helpers.
 

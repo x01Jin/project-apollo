@@ -25,7 +25,7 @@ export const oxygenLeak = {
     ) {
       updatedState.systems[lifeSupportIndex].health = Math.max(
         0,
-        updatedState.systems[lifeSupportIndex].health - 50
+        updatedState.systems[lifeSupportIndex].health - 35
       );
     }
     return updatedState;

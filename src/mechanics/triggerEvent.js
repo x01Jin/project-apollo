@@ -20,13 +20,20 @@ export async function triggerEvent(gameState, config) {
   let updatedState = { ...gameState };
   let triggeredEvent = null;
 
-  // Define event trigger probability (30% chance per turn)
-  const eventChance = 0.3;
+  // Define event trigger probability (default 30% chance per turn)
+  // Can be overridden by `config.eventChance` (0..1)
+  const eventChance =
+    typeof config.eventChance === "number" ? config.eventChance : 0.3;
 
   // Check if an event should trigger
   if (Math.random() < eventChance) {
-    // Determine if it's positive or negative (50/50 chance)
-    const isPositive = Math.random() < 0.5;
+    // Determine if it's positive or negative (default 50/50 chance)
+    // Can be overridden by `config.positiveEventProbability` (0..1)
+    const positiveProbability =
+      typeof config.positiveEventProbability === "number"
+        ? config.positiveEventProbability
+        : 0.5;
+    const isPositive = Math.random() < positiveProbability;
     let selectedEvent;
 
     if (

@@ -98,11 +98,15 @@ export function getDamageModifier(systemName, damageType, gameState) {
   }
 
   // Find all applicable modifiers for this system and damage type
-  const applicableModifiers = gameState.damageModifiers.filter(
-    (modifier) =>
-      modifier.systemName === systemName &&
-      (modifier.type === damageType || modifier.type === "all")
-  );
+  // Support global modifiers targeting `all` so shields and similar systems
+  // can protect every system without adding a modifier per-system.
+  const applicableModifiers = gameState.damageModifiers.filter((modifier) => {
+    // Allow modifiers targeted at the specific system or globally at "all"
+    const targetMatch =
+      modifier.systemName === systemName || modifier.systemName === "all";
+    const typeMatch = modifier.type === damageType || modifier.type === "all";
+    return targetMatch && typeMatch;
+  });
 
   if (applicableModifiers.length === 0) {
     return 1; // Full damage if no modifiers

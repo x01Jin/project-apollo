@@ -22,7 +22,7 @@ export const meteorShower = {
       }
       return {
         ...system,
-        health: Math.max(0, system.health - 30),
+        health: Math.max(0, system.health - 20),
       };
     });
     return updatedState;

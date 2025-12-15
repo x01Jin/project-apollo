@@ -15,11 +15,17 @@ export async function createGameState(config) {
 
   // Clone the systems from config and add health property
   const systems = config.systems.map((system) => {
-    // Normal systems start with random health between 50-100
+    // Normal systems start with random health between 50-100 by default
+    // This can be customized via `config.initialHealthRange = {min, max}`
     // Active and passive systems start at full health for balance
+    const healthRange =
+      config && config.initialHealthRange && typeof config.initialHealthRange.min === 'number' && typeof config.initialHealthRange.max === 'number'
+        ? config.initialHealthRange
+        : { min: 50, max: 100 };
+
     const initialHealth =
       system.type === "normal"
-        ? Math.floor(Math.random() * 51) + 50 // Random between 50-100
+        ? Math.floor(Math.random() * (healthRange.max - healthRange.min + 1)) + healthRange.min
         : 100; // Active and passive systems start at 100%
 
     return {

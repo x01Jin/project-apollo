@@ -8,7 +8,7 @@ Purpose:
 
 Behavior:
 
-- Copies `config.systems`, assigns `health` (normal: random between 50–100, active/passive: 100), sets `maxTurns` to `systems.length * 5`, initializes `damageModifiers`, `deteriorationCount`, and initializes active/passive systems via `initializeActiveSystem`/`initializePassiveSystem`.
+- Copies `config.systems`, assigns `health` (normal: random between 50–100 by default; can be overridden with `config.initialHealthRange = { min, max }`), (active/passive: 100), sets `maxTurns` to `systems.length * 5`, initializes `damageModifiers`, `deteriorationCount`, and initializes active/passive systems via `initializeActiveSystem`/`initializePassiveSystem`.
 
 Return shape (example):
 

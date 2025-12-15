@@ -21,9 +21,9 @@ export const powerSurge = {
         return system; // Protected system takes no damage
       }
       if (system.name === "Power") {
-        return { ...system, health: Math.max(0, system.health - 40) };
+        return { ...system, health: Math.max(0, system.health - 30) };
       } else {
-        return { ...system, health: Math.max(0, system.health - 20) };
+        return { ...system, health: Math.max(0, system.health - 15) };
       }
     });
     return updatedState;

@@ -18,9 +18,10 @@ export const shields = {
    */
   async update(gameState) {
     // Import damage modifier functions
-    const { addDamageModifier, removeDamageModifiers } = await import(
-      "../src/mechanics/damageModifiers.js"
-    );
+    const {
+      addDamageModifier,
+      removeDamageModifiersBySource,
+    } = await import("../src/mechanics/damageModifiers.js");
 
     let updatedState = { ...gameState };
     const shieldsSystem = updatedState.systems.find(
@@ -28,8 +29,8 @@ export const shields = {
     );
 
     if (shieldsSystem) {
-      // Remove existing shields damage modifiers
-      updatedState = removeDamageModifiers(updatedState, "Shields");
+      // Remove existing shields damage modifiers (cleanup by source)
+      updatedState = removeDamageModifiersBySource(updatedState, "shields");
 
       // Add new damage modifier based on shields health
       if (shieldsSystem.health > 0) {
@@ -45,12 +46,16 @@ export const shields = {
 
         // Only add modifier if it provides actual protection
         if (modifier < 1) {
+          // Use a source identifier so we can reliably remove shields modifiers
+          // Use turnsLeft=2 so the modifier survives the end-of-deterioration
+          // cleanup and remains active for the upcoming event phase.
           updatedState = addDamageModifier(
             updatedState,
             "all", // Protect all systems
             modifier,
             "negative_events", // Only protect against negative events
-            1 // Lasts for 1 turn (reapplied each turn)
+            2, // Lasts 2 cycles so it covers the event phase
+            "shields" // Source identifier
           );
         }
       }
