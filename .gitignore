@@ -1,3 +1,6 @@
-.clinerules/
 .roo/
 .vscode/
+references/
+changelogs/
+.ignore
+.codegraph/
